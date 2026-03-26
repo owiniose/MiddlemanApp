@@ -5,7 +5,7 @@ import HomeStack from './HomeStack';
 import SearchStack from './SearchStack';
 import OrdersStack from './OrdersStack';
 import Support from '../screens/Support';
-import Profile from '../screens/Profile';
+import ProfileStack from './ProfileStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -48,7 +48,7 @@ export default function TabNavigator() {
       <Tab.Screen name="Search" component={SearchStack} />
       <Tab.Screen name="Orders" component={OrdersStack} />
       <Tab.Screen name="Support" component={Support} />
-      <Tab.Screen name="Profile" component={Profile} />
+      <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
   );
 }

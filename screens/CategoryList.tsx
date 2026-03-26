@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeStackParamList } from '../types/navigation';
 import { VENDORS } from '../data/vendors';
@@ -27,7 +27,7 @@ export default function CategoryList({ route, navigation }: Props) {
             rating: item.rating,
           })}
         >
-          <View style={styles.cardImage} />
+          <Image source={{ uri: item.image }} style={styles.cardImage} />
           <View style={styles.cardBody}>
             <View style={styles.cardTop}>
               <Text style={styles.cardTitle}>{item.title}</Text>

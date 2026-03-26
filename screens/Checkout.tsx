@@ -1,28 +1,31 @@
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, TextInput, TouchableOpacity,
-  ScrollView, KeyboardAvoidingView, Platform,
+  ScrollView, KeyboardAvoidingView, Platform, Modal, FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useCart } from '../context/CartContext';
 import { useOrders } from '../context/OrdersContext';
+import { useProfile } from '../context/ProfileContext';
 import { RootStackParamList } from '../types/navigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Checkout'>;
 
 const DELIVERY_FEE = 500;
-
 const PAYMENT_METHODS = ['Cash on Delivery', 'Bank Transfer', 'Card'];
 
 export default function Checkout({ navigation }: Props) {
   const { items, vendorId, vendorName, total, clearCart } = useCart();
   const { addOrder } = useOrders();
+  const { phone: savedPhone, addresses } = useProfile();
 
   const [address, setAddress] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(savedPhone);
   const [payment, setPayment] = useState('Cash on Delivery');
   const [errors, setErrors] = useState<{ address?: string; phone?: string }>({});
+  const [addressModal, setAddressModal] = useState(false);
 
   const validate = () => {
     const e: typeof errors = {};
@@ -46,11 +49,7 @@ export default function Checkout({ navigation }: Props) {
       phone: phone.trim(),
     });
     clearCart();
-    navigation.replace('OrderConfirmation', {
-      orderId,
-      vendorName: vendorName!,
-      total: total + DELIVERY_FEE,
-    });
+    navigation.replace('OrderConfirmation', { orderId, vendorName: vendorName!, total: total + DELIVERY_FEE });
   };
 
   return (
@@ -61,7 +60,14 @@ export default function Checkout({ navigation }: Props) {
         <Text style={styles.sectionTitle}>Delivery Details</Text>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Address</Text>
+          <View style={styles.labelRow}>
+            <Text style={styles.label}>Address</Text>
+            {addresses.length > 0 && (
+              <TouchableOpacity onPress={() => setAddressModal(true)}>
+                <Text style={styles.savedLink}>Use saved address</Text>
+              </TouchableOpacity>
+            )}
+          </View>
           <TextInput
             style={[styles.input, errors.address ? styles.inputError : null]}
             placeholder="Enter your delivery address"
@@ -89,11 +95,7 @@ export default function Checkout({ navigation }: Props) {
         {/* Payment method */}
         <Text style={styles.sectionTitle}>Payment Method</Text>
         {PAYMENT_METHODS.map((method) => (
-          <TouchableOpacity
-            key={method}
-            style={styles.paymentOption}
-            onPress={() => setPayment(method)}
-          >
+          <TouchableOpacity key={method} style={styles.paymentOption} onPress={() => setPayment(method)}>
             <View style={[styles.radio, payment === method && styles.radioSelected]} />
             <Text style={styles.paymentLabel}>{method}</Text>
           </TouchableOpacity>
@@ -132,6 +134,38 @@ export default function Checkout({ navigation }: Props) {
           <Text style={styles.placeOrderText}>Place Order · ₦{(total + DELIVERY_FEE).toLocaleString()}</Text>
         </TouchableOpacity>
       </SafeAreaView>
+
+      {/* Saved address picker */}
+      <Modal visible={addressModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Saved Addresses</Text>
+              <TouchableOpacity onPress={() => setAddressModal(false)}>
+                <Ionicons name="close" size={22} color="#374151" />
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={addresses}
+              keyExtractor={(a) => a.id}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.addressOption}
+                  onPress={() => { setAddress(item.address); setErrors((e) => ({ ...e, address: undefined })); setAddressModal(false); }}
+                >
+                  <Ionicons name="location-outline" size={18} color="#0f766e" style={{ marginRight: 10 }} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.addressLabel}>{item.label}</Text>
+                    <Text style={styles.addressText}>{item.address}</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={16} color="#9ca3af" />
+                </TouchableOpacity>
+              )}
+              ItemSeparatorComponent={() => <View style={styles.divider} />}
+            />
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -143,7 +177,9 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 15, fontWeight: '700', color: '#111827', marginBottom: 12, marginTop: 8 },
 
   field: { marginBottom: 16 },
-  label: { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 6 },
+  labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
+  label: { fontSize: 13, fontWeight: '600', color: '#374151' },
+  savedLink: { fontSize: 13, color: '#0f766e', fontWeight: '600' },
   input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, padding: 12, fontSize: 14, color: '#111827' },
   inputError: { borderColor: '#ef4444' },
   errorText: { color: '#ef4444', fontSize: 12, marginTop: 4 },
@@ -168,4 +204,12 @@ const styles = StyleSheet.create({
   footer: { paddingHorizontal: 16, paddingBottom: 12, backgroundColor: '#fff', borderTopWidth: 1, borderColor: '#f3f4f6' },
   placeOrderBtn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 12 },
   placeOrderText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+
+  modalOverlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' },
+  modalSheet: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, maxHeight: '60%' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  modalTitle: { fontSize: 17, fontWeight: '700', color: '#111827' },
+  addressOption: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14 },
+  addressLabel: { fontWeight: '700', fontSize: 14, color: '#111827' },
+  addressText: { fontSize: 13, color: '#6b7280', marginTop: 2 },
 });

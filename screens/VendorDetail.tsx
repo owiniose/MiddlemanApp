@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -13,6 +14,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeStackParamList } from '../types/navigation';
 import { RootStackParamList } from '../types/navigation';
 import { MENU_DATA } from '../data/menu';
+import { VENDOR_BY_ID } from '../data/vendors';
 import { useCart } from '../context/CartContext';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'VendorDetail'>;
@@ -24,12 +26,13 @@ export default function VendorDetail({ route }: Props) {
   const rootNav = useNavigation<RootNav>();
 
   const menuSections = MENU_DATA[id] ?? [];
+  const vendor = VENDOR_BY_ID[id];
 
   const getQty = (itemId: string) => items.find((i) => i.id === itemId)?.qty ?? 0;
 
   return (
     <View style={styles.container}>
-      <View style={styles.hero} />
+      <Image source={{ uri: vendor?.image }} style={styles.hero} />
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.infoCard}>
@@ -54,7 +57,7 @@ export default function VendorDetail({ route }: Props) {
               const qty = getQty(item.id);
               return (
                 <View key={item.id} style={styles.menuItem}>
-                  <View style={styles.menuImagePlaceholder} />
+                  <Image source={{ uri: item.image }} style={styles.menuImagePlaceholder} />
                   <View style={styles.menuInfo}>
                     <Text style={styles.menuName}>{item.name}</Text>
                     <Text style={styles.menuDesc}>{item.description}</Text>
@@ -102,7 +105,7 @@ export default function VendorDetail({ route }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  hero: { height: 240, backgroundColor: '#d1d5db' },
+  hero: { height: 240, backgroundColor: '#d1d5db', width: '100%' },
   scroll: { paddingBottom: 16 },
 
   infoCard: { padding: 16, borderBottomWidth: 1, borderColor: '#f3f4f6' },

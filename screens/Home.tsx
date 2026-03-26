@@ -1,10 +1,11 @@
 import React from 'react';
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, FlatList, Image, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import IconGrid from '../components/IconGrid';
 import { HomeStackParamList } from '../types/navigation';
+import { VENDOR_BY_ID } from '../data/vendors';
 const restaurants = require('../assets/Icons/restaurants.png');
 const groceries = require('../assets/Icons/groceries.png');
 const pharmacies = require('../assets/Icons/pharmacies.png');
@@ -19,10 +20,9 @@ const CATEGORIES = [
   { id: '4', label: 'Packages', icon: packages },
 ];
 
-const FEATURED = [
-  { id: 'r1', title: 'Calabar-Igbo Restaurant - Ikorodu', subtitle: 'From ₦500 · 30 - 40 min', rating: '4.0' },
-  { id: 'r2', title: 'Chicken Republic', subtitle: 'From ₦700 · 25 - 35 min', rating: '4.2' },
-];
+const FEATURED_IDS = ['r1', 'r2'];
+
+const BANNER_URI = 'https://images.unsplash.com/photo-1526367790999-0150786686a2?w=800&auto=format&fit=crop&q=80';
 
 export default function Home() {
   const navigation = useNavigation<NavProp>();
@@ -40,14 +40,18 @@ export default function Home() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.banner}>
-          <Text style={styles.bannerText}>Promo Banner</Text>
-        </View>
+        {/* Banner */}
+        <ImageBackground source={{ uri: BANNER_URI }} style={styles.banner} imageStyle={styles.bannerImage}>
+          <View style={styles.bannerOverlay}>
+            <Text style={styles.bannerTitle}>Fast Delivery</Text>
+            <Text style={styles.bannerSub}>Food, groceries & more to your door</Text>
+          </View>
+        </ImageBackground>
 
         <IconGrid items={CATEGORIES} onPress={(category) => navigation.navigate('CategoryList', { category })} />
 
         <View style={styles.promoBox}>
-          <Text style={styles.promoText}>Get Free Delivery for 30 days!  Redeem Now</Text>
+          <Text style={styles.promoText}>🎉 Get Free Delivery for 30 days!  Redeem Now</Text>
         </View>
 
         <View style={styles.sectionHeader}>
@@ -55,28 +59,32 @@ export default function Home() {
         </View>
 
         <FlatList
-          data={FEATURED}
+          data={FEATURED_IDS}
           horizontal
           showsHorizontalScrollIndicator={false}
-          keyExtractor={(i) => i.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() => navigation.navigate('VendorDetail', {
-                id: item.id,
-                title: item.title,
-                subtitle: item.subtitle,
-                rating: item.rating,
-              })}
-              activeOpacity={0.85}
-            >
-              <View style={styles.cardImage} />
-              <View style={styles.cardRatingRow}>
-                <Text style={styles.cardRating}>⭐ {item.rating}</Text>
-              </View>
-              <Text style={styles.cardTitle}>{item.title}</Text>
-            </TouchableOpacity>
-          )}
+          keyExtractor={(id) => id}
+          renderItem={({ item: id }) => {
+            const vendor = VENDOR_BY_ID[id];
+            if (!vendor) return null;
+            return (
+              <TouchableOpacity
+                style={styles.card}
+                onPress={() => navigation.navigate('VendorDetail', {
+                  id: vendor.id,
+                  title: vendor.title,
+                  subtitle: vendor.subtitle,
+                  rating: vendor.rating,
+                })}
+                activeOpacity={0.85}
+              >
+                <Image source={{ uri: vendor.image }} style={styles.cardImage} />
+                <View style={styles.cardRatingRow}>
+                  <Text style={styles.cardRating}>⭐ {vendor.rating}</Text>
+                </View>
+                <Text style={styles.cardTitle}>{vendor.title}</Text>
+              </TouchableOpacity>
+            );
+          }}
         />
 
         <View style={{ height: 16 }} />
@@ -93,16 +101,21 @@ const styles = StyleSheet.create({
   locationSub: { color: '#666' },
   filterBtn: { backgroundColor: '#0f766e', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 20 },
   filterText: { color: '#fff' },
-  banner: { height: 140, backgroundColor: '#f3f4f6', borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
-  bannerText: { color: '#111' },
+
+  banner: { height: 150, borderRadius: 12, overflow: 'hidden', marginBottom: 16 },
+  bannerImage: { borderRadius: 12 },
+  bannerOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', padding: 16, justifyContent: 'flex-end' },
+  bannerTitle: { color: '#fff', fontSize: 20, fontWeight: '700' },
+  bannerSub: { color: 'rgba(255,255,255,0.85)', fontSize: 13, marginTop: 2 },
+
   promoBox: { backgroundColor: '#eef2ff', padding: 12, borderRadius: 10, marginVertical: 16 },
   promoText: { color: '#3730a3', fontWeight: '600' },
   sectionHeader: { marginBottom: 8 },
   sectionTitle: { fontSize: 16, fontWeight: '700' },
+
   card: { width: 260, marginRight: 12, borderRadius: 10, backgroundColor: '#fff', elevation: 2, paddingBottom: 10 },
-  cardImage: { height: 120, backgroundColor: '#f8fafc', borderTopLeftRadius: 10, borderTopRightRadius: 10 },
+  cardImage: { height: 120, borderTopLeftRadius: 10, borderTopRightRadius: 10, backgroundColor: '#f3f4f6' },
   cardRatingRow: { paddingHorizontal: 8, paddingTop: 8 },
   cardRating: { fontSize: 12, color: '#374151' },
   cardTitle: { fontWeight: '700', paddingHorizontal: 8, paddingTop: 2 },
-  cardSubtitle: { color: '#6b7280', paddingHorizontal: 8, paddingTop: 4, fontSize: 12 },
 });

@@ -30,3 +30,9 @@ export type OrdersStackParamList = {
   OrdersList: undefined;
   OrderDetail: { orderId: string };
 };
+
+export type ProfileStackParamList = {
+  ProfileMain: undefined;
+  EditProfile: undefined;
+  ManageAddresses: undefined;
+};
