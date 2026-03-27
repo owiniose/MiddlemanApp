@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import Text from './Text';
 import * as ImagePicker from 'expo-image-picker';
 import { auth } from '../config/firebase';
 import { getApp } from 'firebase/app';

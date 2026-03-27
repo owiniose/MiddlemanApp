@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ImageSourcePropType } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Image, ImageSourcePropType } from 'react-native';
+import Text from './Text';
 
 type Item = { id: string; label: string; icon?: ImageSourcePropType };
 

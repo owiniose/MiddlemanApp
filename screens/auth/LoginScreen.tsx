@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet,
+  View, TextInput, TouchableOpacity, StyleSheet,
   KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
 } from 'react-native';
+import Text from '../../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 
@@ -29,15 +30,17 @@ export default function LoginScreen({ onGoSignUp }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-          <View style={styles.logoBox}>
-            <Text style={styles.logo}>🛵</Text>
-            <Text style={styles.appName}>Middleman</Text>
-            <Text style={styles.tagline}>Delivery at your doorstep</Text>
-          </View>
+    <SafeAreaView style={styles.outer} edges={['top']}>
+      {/* Teal header */}
+      <View style={styles.header}>
+        <Text style={styles.logo}>🛵</Text>
+        <Text style={styles.appName}>Middleman</Text>
+        <Text style={styles.tagline}>Delivery at your doorstep</Text>
+      </View>
 
+      {/* White form card */}
+      <KeyboardAvoidingView style={styles.cardWrap} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView contentContainerStyle={styles.card} keyboardShouldPersistTaps="handled">
           <Text style={styles.title}>Welcome back</Text>
 
           {error ? <View style={styles.errorBox}><Text style={styles.errorText}>{error}</Text></View> : null}
@@ -68,7 +71,9 @@ export default function LoginScreen({ onGoSignUp }: Props) {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.switchBtn} onPress={onGoSignUp}>
-            <Text style={styles.switchText}>Don't have an account? <Text style={styles.switchLink}>Sign Up</Text></Text>
+            <Text style={styles.switchText}>
+              Don't have an account? <Text style={styles.switchLink}>Sign Up</Text>
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -87,18 +92,38 @@ function friendlyError(code: string) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  scroll: { padding: 24, flexGrow: 1 },
-  logoBox: { alignItems: 'center', marginTop: 20, marginBottom: 36 },
-  logo: { fontSize: 56 },
-  appName: { fontSize: 28, fontWeight: '800', color: '#0f766e', marginTop: 8 },
-  tagline: { fontSize: 14, color: '#6b7280', marginTop: 4 },
-  title: { fontSize: 22, fontWeight: '700', color: '#111827', marginBottom: 20 },
+  outer: { flex: 1, backgroundColor: '#0f766e' },
+
+  header: { alignItems: 'center', paddingTop: 28, paddingBottom: 36 },
+  logo: { fontSize: 52 },
+  appName: { fontSize: 30, fontWeight: '800', color: '#fff', marginTop: 10, letterSpacing: -0.5 },
+  tagline: { fontSize: 14, color: 'rgba(255,255,255,0.75)', marginTop: 4 },
+
+  cardWrap: { flex: 1 },
+  card: {
+    flexGrow: 1,
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    padding: 28,
+    paddingTop: 32,
+  },
+
+  title: { fontSize: 22, fontWeight: '700', color: '#111827', marginBottom: 24 },
   errorBox: { backgroundColor: '#fef2f2', borderRadius: 10, padding: 12, marginBottom: 16 },
   errorText: { color: '#dc2626', fontSize: 13 },
   label: { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 6 },
-  input: { backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, padding: 13, fontSize: 14, color: '#111827', marginBottom: 14 },
-  btn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 8 },
+  input: {
+    backgroundColor: '#f9fafb',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    borderRadius: 12,
+    padding: 14,
+    fontSize: 14,
+    color: '#111827',
+    marginBottom: 16,
+  },
+  btn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 4 },
   btnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
   switchBtn: { alignItems: 'center', marginTop: 24 },
   switchText: { color: '#6b7280', fontSize: 14 },

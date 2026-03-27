@@ -37,6 +37,14 @@ export type ProfileStackParamList = {
   ManageAddresses: undefined;
 };
 
+export type AdminStackParamList = {
+  AdminDashboard: undefined;
+  AdminUsers: undefined;
+  AdminVendors: undefined;
+  AdminOrders: undefined;
+  AdminOrderDetail: { orderId: string };
+};
+
 export type VendorStackParamList = {
   VendorOrders: undefined;
   VendorMenu: undefined;

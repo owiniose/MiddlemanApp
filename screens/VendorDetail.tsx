@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
   Image,
   ActivityIndicator,
 } from 'react-native';
+import Text from '../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
@@ -137,7 +137,7 @@ export default function VendorDetail({ route }: Props) {
                       <TouchableOpacity
                         style={[styles.addBtn, isClosed && styles.addBtnDisabled]}
                         disabled={isClosed}
-                        onPress={() => addItem({ id: item.id, name: item.name, description: item.description, price: item.price, vendorId: id, vendorName: title })}
+                        onPress={() => addItem({ id: item.id, name: item.name, description: item.description, price: item.price, vendorId: id, vendorName: title, image: item.image })}
                       >
                         <Text style={styles.addBtnText}>+</Text>
                       </TouchableOpacity>
