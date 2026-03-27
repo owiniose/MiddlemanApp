@@ -5,10 +5,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useCart } from '../context/CartContext';
 import { RootStackParamList } from '../types/navigation';
+import { CITY_FEE, OUTSKIRTS_FEE } from '../utils/deliveryFee';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Cart'>;
-
-const DELIVERY_FEE = 500;
 
 export default function Cart({ navigation }: Props) {
   const { items, vendorName, total, count, addItem, removeItem } = useCart();
@@ -42,11 +41,14 @@ export default function Cart({ navigation }: Props) {
             </View>
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Delivery fee</Text>
-              <Text style={styles.summaryValue}>₦{DELIVERY_FEE.toLocaleString()}</Text>
+              <Text style={styles.summaryValue}>₦{CITY_FEE.toLocaleString()} – ₦{OUTSKIRTS_FEE.toLocaleString()}</Text>
+            </View>
+            <View style={styles.feeNote}>
+              <Text style={styles.feeNoteText}>Exact fee calculated at checkout based on your area</Text>
             </View>
             <View style={[styles.summaryRow, styles.totalRow]}>
-              <Text style={styles.totalLabel}>Total</Text>
-              <Text style={styles.totalValue}>₦{(total + DELIVERY_FEE).toLocaleString()}</Text>
+              <Text style={styles.totalLabel}>Subtotal</Text>
+              <Text style={styles.totalValue}>₦{total.toLocaleString()}</Text>
             </View>
           </View>
         }
@@ -80,7 +82,7 @@ export default function Cart({ navigation }: Props) {
       <SafeAreaView edges={['bottom']} style={styles.footer}>
         <TouchableOpacity style={styles.checkoutBtn} onPress={() => navigation.navigate('Checkout')}>
           <Text style={styles.checkoutText}>Proceed to Checkout</Text>
-          <Text style={styles.checkoutTotal}>₦{(total + DELIVERY_FEE).toLocaleString()}</Text>
+          <Text style={styles.checkoutTotal}>₦{total.toLocaleString()} + delivery</Text>
         </TouchableOpacity>
       </SafeAreaView>
     </View>
@@ -117,6 +119,8 @@ const styles = StyleSheet.create({
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between' },
   summaryLabel: { color: '#6b7280', fontSize: 14 },
   summaryValue: { fontSize: 14, fontWeight: '500', color: '#111827' },
+  feeNote: { backgroundColor: '#f9fafb', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 },
+  feeNoteText: { fontSize: 11, color: '#9ca3af', textAlign: 'center' },
   totalRow: { borderTopWidth: 1, borderColor: '#f3f4f6', paddingTop: 10, marginTop: 2 },
   totalLabel: { fontWeight: '700', fontSize: 16, color: '#111827' },
   totalValue: { fontWeight: '700', fontSize: 16, color: '#0f766e' },

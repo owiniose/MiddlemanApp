@@ -12,10 +12,10 @@ import { useOrders } from '../context/OrdersContext';
 import { useProfile } from '../context/ProfileContext';
 import { useAuth } from '../context/AuthContext';
 import { RootStackParamList } from '../types/navigation';
+import { getDeliveryFee, getDeliveryZone, CITY_FEE, OUTSKIRTS_FEE } from '../utils/deliveryFee';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Checkout'>;
 
-const DELIVERY_FEE = 500;
 const PAYMENT_METHODS = ['Cash on Delivery', 'Bank Transfer', 'Card'];
 
 export default function Checkout({ navigation }: Props) {
@@ -29,6 +29,9 @@ export default function Checkout({ navigation }: Props) {
   const [payment, setPayment] = useState('Cash on Delivery');
   const [errors, setErrors] = useState<{ address?: string; phone?: string }>({});
   const [addressModal, setAddressModal] = useState(false);
+
+  const deliveryFee = getDeliveryFee(address);
+  const deliveryZone = address.trim() ? getDeliveryZone(address) : null;
 
   const validate = () => {
     const e: typeof errors = {};
@@ -47,8 +50,8 @@ export default function Checkout({ navigation }: Props) {
         vendorName: vendorName!,
         items,
         subtotal: total,
-        deliveryFee: DELIVERY_FEE,
-        total: total + DELIVERY_FEE,
+        deliveryFee: deliveryFee,
+        total: total + deliveryFee,
         address: address.trim(),
         phone: phone.trim(),
       },
@@ -56,7 +59,7 @@ export default function Checkout({ navigation }: Props) {
       profile?.name ?? 'Customer',
     );
     clearCart();
-    navigation.replace('OrderConfirmation', { orderId, vendorName: vendorName!, total: total + DELIVERY_FEE });
+    navigation.replace('OrderConfirmation', { orderId, vendorName: vendorName!, total: total + deliveryFee });
   };
 
   return (
@@ -84,6 +87,13 @@ export default function Checkout({ navigation }: Props) {
             multiline
           />
           {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
+          {deliveryZone && (
+            <View style={[styles.zoneBadge, deliveryFee === OUTSKIRTS_FEE && styles.zoneBadgeOutskirts]}>
+              <Text style={[styles.zoneText, deliveryFee === OUTSKIRTS_FEE && styles.zoneTextOutskirts]}>
+                📍 {deliveryZone} — ₦{deliveryFee.toLocaleString()} delivery
+              </Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.field}>
@@ -125,11 +135,11 @@ export default function Checkout({ navigation }: Props) {
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Delivery fee</Text>
-            <Text style={styles.summaryValue}>₦{DELIVERY_FEE.toLocaleString()}</Text>
+            <Text style={styles.summaryValue}>₦{deliveryFee.toLocaleString()}</Text>
           </View>
           <View style={[styles.summaryRow, styles.totalRow]}>
             <Text style={styles.totalLabel}>Total</Text>
-            <Text style={styles.totalValue}>₦{(total + DELIVERY_FEE).toLocaleString()}</Text>
+            <Text style={styles.totalValue}>₦{(total + deliveryFee).toLocaleString()}</Text>
           </View>
         </View>
 
@@ -138,7 +148,7 @@ export default function Checkout({ navigation }: Props) {
 
       <SafeAreaView edges={['bottom']} style={styles.footer}>
         <TouchableOpacity style={styles.placeOrderBtn} onPress={placeOrder}>
-          <Text style={styles.placeOrderText}>Place Order · ₦{(total + DELIVERY_FEE).toLocaleString()}</Text>
+          <Text style={styles.placeOrderText}>Place Order · ₦{(total + deliveryFee).toLocaleString()}</Text>
         </TouchableOpacity>
       </SafeAreaView>
 
@@ -190,6 +200,11 @@ const styles = StyleSheet.create({
   input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, padding: 12, fontSize: 14, color: '#111827' },
   inputError: { borderColor: '#ef4444' },
   errorText: { color: '#ef4444', fontSize: 12, marginTop: 4 },
+
+  zoneBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f0fdf4', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, marginTop: 6 },
+  zoneBadgeOutskirts: { backgroundColor: '#fffbeb' },
+  zoneText: { fontSize: 12, fontWeight: '600', color: '#065f46' },
+  zoneTextOutskirts: { color: '#92400e' },
 
   paymentOption: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 10, padding: 14, marginBottom: 8, gap: 12 },
   radio: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: '#d1d5db' },
