@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View, StyleSheet, ScrollView, TouchableOpacity, Alert,
 } from 'react-native';
@@ -7,6 +7,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { OrdersStackParamList } from '../types/navigation';
 import { useOrders, OrderStatus } from '../context/OrdersContext';
+import { useAuth } from '../context/AuthContext';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import ReviewModal from '../components/ReviewModal';
 
 type Props = NativeStackScreenProps<OrdersStackParamList, 'OrderDetail'>;
 
@@ -23,7 +27,26 @@ const STEPS: OrderStatus[] = ['Pending', 'Preparing', 'On the way', 'Delivered']
 export default function OrderDetail({ route, navigation }: Props) {
   const { orderId } = route.params;
   const { orders, cancelOrder } = useOrders();
+  const { user } = useAuth();
   const order = orders.find((o) => o.id === orderId);
+
+  const [hasReviewed, setHasReviewed] = useState(false);
+  const [myRating, setMyRating] = useState(0);
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
+
+  useEffect(() => {
+    if (!user || !order || order.status !== 'Delivered') return;
+    getDocs(query(
+      collection(db, 'reviews'),
+      where('orderId', '==', orderId),
+      where('customerId', '==', user.uid),
+    )).then((snap) => {
+      if (!snap.empty) {
+        setHasReviewed(true);
+        setMyRating(snap.docs[0].data().rating as number);
+      }
+    });
+  }, [orderId, user, order?.status]);
 
   if (!order) {
     return (
@@ -36,6 +59,7 @@ export default function OrderDetail({ route, navigation }: Props) {
   const status = STATUS_CONFIG[order.status];
   const canCancel = order.status === 'Pending';
   const isCancelled = order.status === 'Cancelled';
+  const isDelivered = order.status === 'Delivered';
 
   const handleCancel = () => {
     Alert.alert(
@@ -46,10 +70,7 @@ export default function OrderDetail({ route, navigation }: Props) {
         {
           text: 'Yes, Cancel',
           style: 'destructive',
-          onPress: () => {
-            cancelOrder(orderId);
-            navigation.goBack();
-          },
+          onPress: () => { cancelOrder(orderId); navigation.goBack(); },
         },
       ]
     );
@@ -93,6 +114,29 @@ export default function OrderDetail({ route, navigation }: Props) {
             </View>
           )}
         </View>
+
+        {/* Review section */}
+        {isDelivered && (
+          <View style={styles.reviewCard}>
+            {hasReviewed ? (
+              <View style={styles.reviewedRow}>
+                <Text style={styles.reviewedText}>Your rating</Text>
+                <View style={styles.starsRow}>
+                  {[1,2,3,4,5].map((s) => (
+                    <Text key={s} style={[styles.starSmall, s <= myRating ? styles.starFilled : styles.starEmpty]}>★</Text>
+                  ))}
+                </View>
+              </View>
+            ) : (
+              <>
+                <Text style={styles.reviewPrompt}>How was your order?</Text>
+                <TouchableOpacity style={styles.rateBtn} onPress={() => setReviewModalVisible(true)}>
+                  <Text style={styles.rateBtnText}>⭐ Rate this order</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        )}
 
         {/* Order info */}
         <View style={styles.card}>
@@ -138,6 +182,15 @@ export default function OrderDetail({ route, navigation }: Props) {
           </TouchableOpacity>
         </SafeAreaView>
       )}
+
+      <ReviewModal
+        visible={reviewModalVisible}
+        onClose={() => setReviewModalVisible(false)}
+        onSubmitted={(r) => { setHasReviewed(true); setMyRating(r); setReviewModalVisible(false); }}
+        vendorId={order.vendorId}
+        vendorName={order.vendorName}
+        orderId={orderId}
+      />
     </View>
   );
 }
@@ -170,6 +223,17 @@ const styles = StyleSheet.create({
   trackerLineActive: { backgroundColor: '#0f766e' },
   trackerLabel: { fontSize: 11, color: '#9ca3af' },
   trackerLabelActive: { color: '#0f766e', fontWeight: '700' },
+
+  reviewCard: { backgroundColor: '#fff', borderRadius: 14, padding: 16, alignItems: 'center', gap: 10 },
+  reviewPrompt: { fontSize: 15, fontWeight: '600', color: '#111827' },
+  rateBtn: { backgroundColor: '#fef3c7', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 20 },
+  rateBtnText: { fontWeight: '700', fontSize: 14, color: '#b45309' },
+  reviewedRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  reviewedText: { fontSize: 14, color: '#6b7280', fontWeight: '600' },
+  starsRow: { flexDirection: 'row', gap: 2 },
+  starSmall: { fontSize: 20 },
+  starFilled: { color: '#f59e0b' },
+  starEmpty: { color: '#e5e7eb' },
 
   card: { backgroundColor: '#fff', borderRadius: 14, padding: 16, gap: 10 },
   sectionTitle: { fontWeight: '700', fontSize: 14, color: '#111827', marginBottom: 2 },

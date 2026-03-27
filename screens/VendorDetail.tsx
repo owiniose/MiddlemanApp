@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, orderBy } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { HomeStackParamList, RootStackParamList } from '../types/navigation';
 import { useCart } from '../context/CartContext';
@@ -35,6 +35,15 @@ type VendorData = {
   minOrder?: string;
   image?: string;
   open?: boolean;
+  rating?: string;
+};
+
+type Review = {
+  id: string;
+  customerName: string;
+  rating: number;
+  comment: string;
+  createdAt: Date;
 };
 
 export default function VendorDetail({ route }: Props) {
@@ -45,6 +54,8 @@ export default function VendorDetail({ route }: Props) {
   const [menuSections, setMenuSections] = useState<{ section: string; items: MenuItem[] }[]>([]);
   const [vendorData, setVendorData] = useState<VendorData>({});
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
@@ -62,9 +73,25 @@ export default function VendorDetail({ route }: Props) {
       setMenuSections(Object.entries(grouped).map(([section, items]) => ({ section, items })));
       setLoading(false);
     });
+
+    getDocs(query(
+      collection(db, 'reviews'),
+      where('vendorId', '==', id),
+      orderBy('createdAt', 'desc'),
+    )).then((snap) => {
+      setReviews(snap.docs.map((d) => ({
+        id: d.id,
+        customerName: d.data().customerName,
+        rating: d.data().rating,
+        comment: d.data().comment,
+        createdAt: d.data().createdAt?.toDate?.() ?? new Date(),
+      })));
+      setReviewsLoading(false);
+    });
   }, [id]);
 
   const getQty = (itemId: string) => items.find((i) => i.id === itemId)?.qty ?? 0;
+  const liveRating = vendorData.rating ?? rating;
 
   return (
     <View style={styles.container}>
@@ -78,7 +105,7 @@ export default function VendorDetail({ route }: Props) {
           <Text style={styles.vendorName}>{title}</Text>
           <View style={styles.badges}>
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>⭐ {rating}</Text>
+              <Text style={styles.badgeText}>⭐ {liveRating}</Text>
             </View>
             {vendorData.deliveryTime && (
               <View style={styles.badge}>
@@ -88,6 +115,11 @@ export default function VendorDetail({ route }: Props) {
             {vendorData.minOrder && (
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>Min. {vendorData.minOrder}</Text>
+              </View>
+            )}
+            {reviews.length > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>💬 {reviews.length} review{reviews.length !== 1 ? 's' : ''}</Text>
               </View>
             )}
           </View>
@@ -149,6 +181,38 @@ export default function VendorDetail({ route }: Props) {
           ))
         )}
 
+        {/* Reviews section */}
+        <View style={styles.reviewsSection}>
+          <Text style={styles.reviewsTitle}>Reviews</Text>
+          {reviewsLoading ? (
+            <ActivityIndicator size="small" color="#0f766e" style={{ marginTop: 12 }} />
+          ) : reviews.length === 0 ? (
+            <Text style={styles.noReviews}>No reviews yet — be the first!</Text>
+          ) : (
+            reviews.map((r) => (
+              <View key={r.id} style={styles.reviewCard}>
+                <View style={styles.reviewTop}>
+                  <View style={styles.reviewAvatar}>
+                    <Text style={styles.reviewAvatarText}>{r.customerName.charAt(0).toUpperCase()}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.reviewName}>{r.customerName}</Text>
+                    <View style={styles.reviewStars}>
+                      {[1,2,3,4,5].map((s) => (
+                        <Text key={s} style={[styles.reviewStar, s <= r.rating ? styles.starFilled : styles.starEmpty]}>★</Text>
+                      ))}
+                    </View>
+                  </View>
+                  <Text style={styles.reviewDate}>
+                    {r.createdAt.toLocaleDateString([], { day: 'numeric', month: 'short' })}
+                  </Text>
+                </View>
+                {r.comment ? <Text style={styles.reviewComment}>{r.comment}</Text> : null}
+              </View>
+            ))
+          )}
+        </View>
+
         <View style={{ height: 100 }} />
       </ScrollView>
 
@@ -203,6 +267,21 @@ const styles = StyleSheet.create({
   addBtnText: { color: '#fff', fontSize: 18, lineHeight: 22 },
   closedBanner: { backgroundColor: '#fef2f2', borderRadius: 10, marginHorizontal: 16, marginTop: 12, padding: 12 },
   closedBannerText: { color: '#dc2626', fontSize: 13, fontWeight: '600', textAlign: 'center' },
+
+  reviewsSection: { paddingHorizontal: 16, paddingTop: 24 },
+  reviewsTitle: { fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 12 },
+  noReviews: { color: '#9ca3af', fontSize: 14, textAlign: 'center', paddingVertical: 16 },
+  reviewCard: { backgroundColor: '#f9fafb', borderRadius: 12, padding: 12, marginBottom: 10, gap: 6 },
+  reviewTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  reviewAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#0f766e', alignItems: 'center', justifyContent: 'center' },
+  reviewAvatarText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  reviewName: { fontSize: 13, fontWeight: '700', color: '#111827' },
+  reviewStars: { flexDirection: 'row', gap: 2, marginTop: 2 },
+  reviewStar: { fontSize: 13 },
+  starFilled: { color: '#f59e0b' },
+  starEmpty: { color: '#d1d5db' },
+  reviewDate: { fontSize: 11, color: '#9ca3af' },
+  reviewComment: { fontSize: 13, color: '#374151', lineHeight: 18, paddingLeft: 46 },
 
   cartBarWrap: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 16, paddingBottom: 12 },
   cartBar: { backgroundColor: '#0f766e', borderRadius: 14, flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 16 },

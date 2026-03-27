@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Text from '../../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../context/AuthContext';
+import { sendPushNotification } from '../../utils/notifications';
 
 type OrderStatus = 'Pending' | 'Preparing' | 'On the way' | 'Delivered' | 'Cancelled';
 
 type Order = {
   id: string;
+  customerId: string;
   customerName: string;
   items: { name: string; qty: number; price: number }[];
   total: number;
@@ -28,8 +30,8 @@ const STATUS_CONFIG: Record<OrderStatus, { bg: string; color: string }> = {
 };
 
 const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
-  Pending:   'Preparing',
-  Preparing: 'On the way',
+  Pending:      'Preparing',
+  Preparing:    'On the way',
   'On the way': 'Delivered',
 };
 
@@ -38,6 +40,27 @@ const NEXT_LABEL: Partial<Record<OrderStatus, string>> = {
   Preparing:    'Mark On the Way',
   'On the way': 'Mark Delivered',
 };
+
+const NOTIFICATION_COPY: Partial<Record<OrderStatus, { title: string; body: (vendor: string) => string }>> = {
+  Preparing:    { title: 'Order Confirmed! 🍳', body: (v) => `Your order from ${v} is being prepared.` },
+  'On the way': { title: "On the Way! 🛵",      body: (v) => `Your order from ${v} is heading to you.` },
+  Delivered:    { title: 'Delivered! 🎉',        body: (v) => `Your order from ${v} has arrived. Enjoy!` },
+  Cancelled:    { title: 'Order Cancelled ❌',   body: (v) => `Your order from ${v} was cancelled.` },
+};
+
+async function notifyCustomer(customerId: string, status: OrderStatus, vendorName: string) {
+  const copy = NOTIFICATION_COPY[status];
+  if (!copy) return;
+  try {
+    const userSnap = await getDoc(doc(db, 'users', customerId));
+    const pushToken = userSnap.data()?.pushToken as string | undefined;
+    if (pushToken) {
+      await sendPushNotification(pushToken, copy.title, copy.body(vendorName));
+    }
+  } catch {
+    // Notification failure should never break the order flow
+  }
+}
 
 export default function VendorOrders() {
   const { profile } = useAuth();
@@ -56,12 +79,14 @@ export default function VendorOrders() {
     return unsub;
   }, [profile?.vendorId]);
 
-  const updateStatus = async (orderId: string, status: OrderStatus) => {
-    await updateDoc(doc(db, 'orders', orderId), { status });
+  const updateStatus = async (order: Order, status: OrderStatus) => {
+    await updateDoc(doc(db, 'orders', order.id), { status });
+    notifyCustomer(order.customerId, status, profile?.name ?? 'Your vendor');
   };
 
-  const cancelOrder = async (orderId: string) => {
-    await updateDoc(doc(db, 'orders', orderId), { status: 'Cancelled' });
+  const cancelOrder = async (order: Order) => {
+    await updateDoc(doc(db, 'orders', order.id), { status: 'Cancelled' });
+    notifyCustomer(order.customerId, 'Cancelled', profile?.name ?? 'Your vendor');
   };
 
   if (loading) return <View style={styles.center}><ActivityIndicator size="large" color="#0f766e" /></View>;
@@ -115,12 +140,15 @@ export default function VendorOrders() {
                 {(nextStatus || item.status === 'Pending') && (
                   <View style={styles.actionRow}>
                     {item.status === 'Pending' && (
-                      <TouchableOpacity style={styles.cancelBtn} onPress={() => cancelOrder(item.id)}>
+                      <TouchableOpacity style={styles.cancelBtn} onPress={() => cancelOrder(item)}>
                         <Text style={styles.cancelBtnText}>Reject</Text>
                       </TouchableOpacity>
                     )}
                     {nextStatus && nextLabel && (
-                      <TouchableOpacity style={[styles.actionBtn, { flex: item.status === 'Pending' ? 1 : undefined }]} onPress={() => updateStatus(item.id, nextStatus)}>
+                      <TouchableOpacity
+                        style={[styles.actionBtn, { flex: item.status === 'Pending' ? 1 : undefined }]}
+                        onPress={() => updateStatus(item, nextStatus)}
+                      >
                         <Text style={styles.actionBtnText}>{nextLabel}</Text>
                       </TouchableOpacity>
                     )}

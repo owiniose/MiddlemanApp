@@ -2,44 +2,21 @@ import React, { useState } from 'react';
 import { View, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import Text from './Text';
 import * as ImagePicker from 'expo-image-picker';
-import { auth } from '../config/firebase';
-import { getApp } from 'firebase/app';
 
-const STORAGE_BUCKET = getApp().options.storageBucket ?? '';
+const CLOUDINARY_CLOUD = 'dlpfarf9b';
+const CLOUDINARY_PRESET = 'middleman_app';
 
-// Uploads a base64 image to Firebase Storage via the REST API.
-// Avoids the Firebase JS Storage SDK entirely because it internally
-// creates Blobs from ArrayBuffers, which React Native does not support.
-async function uploadImage(base64Data: string, storagePath: string): Promise<string> {
-  const token = await auth.currentUser?.getIdToken();
-  if (!token) throw new Error('Not authenticated');
-
-  const boundary = `boundary${Date.now()}`;
-  const encodedPath = encodeURIComponent(storagePath);
-
-  // Multipart/related body constructed as a plain string.
-  // The image part is base64-encoded (Content-Transfer-Encoding: base64),
-  // which Firebase Storage / GCS accepts per RFC 2045.
-  const body =
-    `--${boundary}\r\n` +
-    `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
-    `{"contentType":"image/jpeg"}\r\n` +
-    `--${boundary}\r\n` +
-    `Content-Type: image/jpeg\r\n` +
-    `Content-Transfer-Encoding: base64\r\n\r\n` +
-    base64Data +
-    `\r\n--${boundary}--`;
-
+async function uploadImage(base64Data: string): Promise<string> {
   const response = await fetch(
-    `https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o` +
-    `?uploadType=multipart&name=${encodedPath}`,
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,
     {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': `multipart/related; boundary=${boundary}`,
-      },
-      body,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        file: `data:image/jpeg;base64,${base64Data}`,
+        upload_preset: CLOUDINARY_PRESET,
+        public_id: `upload_${Date.now()}`,
+      }),
     }
   );
 
@@ -49,16 +26,12 @@ async function uploadImage(base64Data: string, storagePath: string): Promise<str
   }
 
   const data = await response.json();
-  return (
-    `https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o/` +
-    `${encodedPath}?alt=media&token=${data.downloadTokens}`
-  );
+  return data.secure_url as string;
 }
 
 type Props = {
   value: string | null | undefined;
   onChange: (url: string) => void;
-  uploadPath: string;
   width?: number;
   height?: number;
   shape?: 'square' | 'circle';
@@ -68,7 +41,6 @@ type Props = {
 export default function ImagePickerField({
   value,
   onChange,
-  uploadPath,
   width = 120,
   height = 120,
   shape = 'square',
@@ -103,7 +75,7 @@ export default function ImagePickerField({
     setError('');
     setUploading(true);
     try {
-      const url = await uploadImage(base64, uploadPath);
+      const url = await uploadImage(base64);
       onChange(url);
     } catch (e: any) {
       setError(e?.message ?? 'Upload failed. Please try again.');

@@ -24,8 +24,6 @@ export default function VendorAddItem({ navigation }: Props) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
-  const uploadPath = `menuItems/${profile?.vendorId}/${Date.now()}.jpg`;
-
   const validate = () => {
     const e: Record<string, string> = {};
     if (!name.trim()) e.name = 'Item name is required';
@@ -67,7 +65,6 @@ export default function VendorAddItem({ navigation }: Props) {
           <ImagePickerField
             value={imageUrl}
             onChange={setImageUrl}
-            uploadPath={uploadPath}
             width={200}
             height={150}
             aspect={[4, 3]}

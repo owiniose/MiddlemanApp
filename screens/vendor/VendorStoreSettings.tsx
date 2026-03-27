@@ -99,7 +99,6 @@ export default function VendorStoreSettings() {
           <ImagePickerField
             value={store.image}
             onChange={(url) => set('image')(url)}
-            uploadPath={`vendors/${profile?.vendorId}/store.jpg`}
             width={340}
             height={160}
             aspect={[16, 9]}
