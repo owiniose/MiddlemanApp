@@ -6,12 +6,17 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../types/navigation';
 import { useProfile } from '../context/ProfileContext';
 import { useOrders } from '../context/OrdersContext';
+import { useAuth } from '../context/AuthContext';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'>;
 
 export default function Profile({ navigation }: Props) {
-  const { name, phone, email } = useProfile();
+  const { addresses } = useProfile();
   const { orders } = useOrders();
+  const { logOut, profile: authProfile } = useAuth();
+  const name = authProfile?.name ?? '';
+  const phone = authProfile?.phone ?? '';
+  const email = authProfile?.email ?? '';
   const [notifications, setNotifications] = React.useState(true);
 
   const initials = name
@@ -21,7 +26,7 @@ export default function Profile({ navigation }: Props) {
   const handleSignOut = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign Out', style: 'destructive', onPress: () => {} },
+      { text: 'Sign Out', style: 'destructive', onPress: logOut },
     ]);
   };
 
@@ -81,16 +86,16 @@ export default function Profile({ navigation }: Props) {
             icon="bag-handle-outline"
             label="Order History"
             value={`${orders.length} orders`}
-            onPress={() => {}}
+            onPress={() => navigation.getParent()?.navigate('Orders')}
           />
         </View>
 
         {/* Support */}
         <Text style={styles.sectionLabel}>Support</Text>
         <View style={styles.menuCard}>
-          <MenuItem icon="help-circle-outline" label="Help & FAQ" onPress={() => {}} />
+          <MenuItem icon="help-circle-outline" label="Help & FAQ" onPress={() => navigation.getParent()?.navigate('Support')} />
           <Divider />
-          <MenuItem icon="chatbubble-outline" label="Contact Us" onPress={() => {}} />
+          <MenuItem icon="chatbubble-outline" label="Contact Us" onPress={() => navigation.getParent()?.navigate('Support')} />
           <Divider />
           <MenuItem icon="information-circle-outline" label="About MiddlemanApp" value="v1.0.0" onPress={() => {}} />
         </View>

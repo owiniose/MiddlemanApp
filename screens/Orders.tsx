@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useOrders, Order, OrderStatus } from '../context/OrdersContext';
+import { useAuth } from '../context/AuthContext';
 import { OrdersStackParamList } from '../types/navigation';
 
 const STATUS_CONFIG: Record<OrderStatus, { label: string; bg: string; color: string }> = {
+  'Pending':    { label: 'Pending',    bg: '#f3f4f6', color: '#6b7280' },
   'Preparing':  { label: 'Preparing',  bg: '#fef3c7', color: '#d97706' },
   'On the way': { label: 'On the way', bg: '#dbeafe', color: '#2563eb' },
   'Delivered':  { label: 'Delivered',  bg: '#dcfce7', color: '#16a34a' },
+  'Cancelled':  { label: 'Cancelled',  bg: '#fee2e2', color: '#dc2626' },
 };
 
 type NavProp = NativeStackNavigationProp<OrdersStackParamList, 'OrdersList'>;
@@ -42,7 +45,14 @@ function OrderCard({ order }: { order: Order }) {
 }
 
 export default function Orders() {
-  const { orders } = useOrders();
+  const { orders, listenToOrders } = useOrders();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user?.uid) return;
+    const unsub = listenToOrders(user.uid);
+    return unsub;
+  }, [user?.uid]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>

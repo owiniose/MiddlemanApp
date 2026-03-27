@@ -10,12 +10,14 @@ import { useOrders, OrderStatus } from '../context/OrdersContext';
 type Props = NativeStackScreenProps<OrdersStackParamList, 'OrderDetail'>;
 
 const STATUS_CONFIG: Record<OrderStatus, { label: string; bg: string; color: string; step: number }> = {
+  'Pending':    { label: 'Pending',    bg: '#f3f4f6', color: '#6b7280', step: 0 },
   'Preparing':  { label: 'Preparing',  bg: '#fef3c7', color: '#d97706', step: 1 },
   'On the way': { label: 'On the way', bg: '#dbeafe', color: '#2563eb', step: 2 },
   'Delivered':  { label: 'Delivered',  bg: '#dcfce7', color: '#16a34a', step: 3 },
+  'Cancelled':  { label: 'Cancelled',  bg: '#fee2e2', color: '#dc2626', step: -1 },
 };
 
-const STEPS: OrderStatus[] = ['Preparing', 'On the way', 'Delivered'];
+const STEPS: OrderStatus[] = ['Pending', 'Preparing', 'On the way', 'Delivered'];
 
 export default function OrderDetail({ route, navigation }: Props) {
   const { orderId } = route.params;
@@ -31,7 +33,8 @@ export default function OrderDetail({ route, navigation }: Props) {
   }
 
   const status = STATUS_CONFIG[order.status];
-  const canCancel = order.status === 'Preparing';
+  const canCancel = order.status === 'Pending';
+  const isCancelled = order.status === 'Cancelled';
 
   const handleCancel = () => {
     Alert.alert(
@@ -63,23 +66,31 @@ export default function OrderDetail({ route, navigation }: Props) {
           <View style={[styles.statusBadge, { backgroundColor: status.bg }]}>
             <Text style={[styles.statusText, { color: status.color }]}>{status.label}</Text>
           </View>
-          <View style={styles.tracker}>
-            {STEPS.map((step, i) => {
-              const done = STATUS_CONFIG[order.status].step > i;
-              const active = STATUS_CONFIG[order.status].step === i + 1;
-              return (
-                <React.Fragment key={step}>
-                  <View style={styles.trackerStep}>
-                    <View style={[styles.trackerDot, done || active ? styles.trackerDotActive : null]} />
-                    <Text style={[styles.trackerLabel, active ? styles.trackerLabelActive : null]}>{step}</Text>
-                  </View>
-                  {i < STEPS.length - 1 && (
-                    <View style={[styles.trackerLine, done ? styles.trackerLineActive : null]} />
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </View>
+
+          {isCancelled ? (
+            <View style={styles.cancelledNote}>
+              <Text style={styles.cancelledNoteText}>This order was cancelled.</Text>
+            </View>
+          ) : (
+            <View style={styles.tracker}>
+              {STEPS.map((step, i) => {
+                const currentStep = STATUS_CONFIG[order.status].step;
+                const done = currentStep > i;
+                const active = currentStep === i;
+                return (
+                  <React.Fragment key={step}>
+                    <View style={styles.trackerStep}>
+                      <View style={[styles.trackerDot, done || active ? styles.trackerDotActive : null]} />
+                      <Text style={[styles.trackerLabel, active ? styles.trackerLabelActive : null]}>{step}</Text>
+                    </View>
+                    {i < STEPS.length - 1 && (
+                      <View style={[styles.trackerLine, done ? styles.trackerLineActive : null]} />
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </View>
+          )}
         </View>
 
         {/* Order info */}
@@ -148,6 +159,8 @@ const styles = StyleSheet.create({
   trackerCard: { backgroundColor: '#fff', borderRadius: 14, padding: 16, gap: 16 },
   statusBadge: { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20 },
   statusText: { fontWeight: '700', fontSize: 13 },
+  cancelledNote: { paddingVertical: 8 },
+  cancelledNoteText: { color: '#6b7280', fontSize: 13 },
   tracker: { flexDirection: 'row', alignItems: 'center' },
   trackerStep: { alignItems: 'center', gap: 6 },
   trackerDot: { width: 14, height: 14, borderRadius: 7, backgroundColor: '#e5e7eb', borderWidth: 2, borderColor: '#e5e7eb' },

@@ -36,3 +36,18 @@ export type ProfileStackParamList = {
   EditProfile: undefined;
   ManageAddresses: undefined;
 };
+
+export type VendorStackParamList = {
+  VendorOrders: undefined;
+  VendorMenu: undefined;
+  VendorAddItem: undefined;
+  VendorEditItem: {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    section: string;
+    image: string;
+  };
+  VendorStoreSettings: undefined;
+};

@@ -1,4 +1,7 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import { useAuth } from './AuthContext';
 
 export type SavedAddress = {
   id: string;
@@ -7,11 +10,7 @@ export type SavedAddress = {
 };
 
 type ProfileContextType = {
-  name: string;
-  phone: string;
-  email: string;
   addresses: SavedAddress[];
-  updateProfile: (data: { name: string; phone: string; email: string }) => void;
   addAddress: (label: string, address: string) => void;
   removeAddress: (id: string) => void;
 };
@@ -19,27 +18,31 @@ type ProfileContextType = {
 const ProfileContext = createContext<ProfileContextType | null>(null);
 
 export function ProfileProvider({ children }: { children: React.ReactNode }) {
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
+  const { user } = useAuth();
   const [addresses, setAddresses] = useState<SavedAddress[]>([]);
 
-  const updateProfile = (data: { name: string; phone: string; email: string }) => {
-    setName(data.name);
-    setPhone(data.phone);
-    setEmail(data.email);
-  };
+  useEffect(() => {
+    if (!user) { setAddresses([]); return; }
+    getDoc(doc(db, 'users', user.uid)).then((snap) => {
+      if (snap.exists()) setAddresses(snap.data().addresses ?? []);
+    });
+  }, [user?.uid]);
 
   const addAddress = (label: string, address: string) => {
-    setAddresses((prev) => [...prev, { id: Date.now().toString(), label, address }]);
+    const newAddr: SavedAddress = { id: Date.now().toString(), label, address };
+    const updated = [...addresses, newAddr];
+    setAddresses(updated);
+    if (user) updateDoc(doc(db, 'users', user.uid), { addresses: updated });
   };
 
   const removeAddress = (id: string) => {
-    setAddresses((prev) => prev.filter((a) => a.id !== id));
+    const updated = addresses.filter((a) => a.id !== id);
+    setAddresses(updated);
+    if (user) updateDoc(doc(db, 'users', user.uid), { addresses: updated });
   };
 
   return (
-    <ProfileContext.Provider value={{ name, phone, email, addresses, updateProfile, addAddress, removeAddress }}>
+    <ProfileContext.Provider value={{ addresses, addAddress, removeAddress }}>
       {children}
     </ProfileContext.Provider>
   );

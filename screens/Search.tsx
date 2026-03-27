@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,15 +6,36 @@ import {
   SectionList,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
-import { ALL_VENDORS, Vendor } from '../data/vendors';
-import { ALL_MENU_ITEMS, MenuItem } from '../data/menu';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
 import { SearchStackParamList } from '../types/navigation';
 
 type NavProp = NativeStackNavigationProp<SearchStackParamList, 'SearchScreen'>;
+
+type Vendor = {
+  id: string;
+  name: string;
+  area: string;
+  rating: string;
+  deliveryTime: string;
+  minOrder: string;
+  category: string;
+  open: boolean;
+};
+
+type MenuItem = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  section: string;
+  vendorId: string;
+};
 
 const CATEGORY_EMOJI: Record<string, string> = {
   Restaurants: '🍽️',
@@ -23,55 +44,65 @@ const CATEGORY_EMOJI: Record<string, string> = {
   Packages: '📦',
 };
 
-// Map vendorId → vendor for quick lookup
-const VENDOR_MAP = Object.fromEntries(ALL_VENDORS.map((v) => [v.id, v]));
-
 type ResultSection =
   | { type: 'vendor'; data: Vendor }
-  | { type: 'item'; data: MenuItem };
+  | { type: 'item'; data: MenuItem; vendor?: Vendor };
 
 export default function Search() {
   const navigation = useNavigation<NavProp>();
   const [query, setQuery] = useState('');
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      getDocs(collection(db, 'vendors')),
+      getDocs(collection(db, 'menuItems')),
+    ]).then(([vendorSnap, menuSnap]) => {
+      setVendors(vendorSnap.docs.map((d) => ({ id: d.id, ...d.data() } as Vendor)));
+      setMenuItems(menuSnap.docs.map((d) => ({ id: d.id, ...d.data() } as MenuItem)));
+      setLoading(false);
+    });
+  }, []);
+
+  const vendorMap = useMemo(() =>
+    Object.fromEntries(vendors.map((v) => [v.id, v])),
+    [vendors]
+  );
 
   const sections = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
 
-    const vendorHits = ALL_VENDORS.filter(
+    const vendorHits = vendors.filter(
       (v) =>
-        v.title.toLowerCase().includes(q) ||
-        v.subtitle.toLowerCase().includes(q) ||
+        v.name.toLowerCase().includes(q) ||
+        v.area.toLowerCase().includes(q) ||
         v.category.toLowerCase().includes(q)
     );
 
-    const itemHits = ALL_MENU_ITEMS.filter(
+    const itemHits = menuItems.filter(
       (m) =>
         m.name.toLowerCase().includes(q) ||
-        m.description.toLowerCase().includes(q) ||
-        m.category.toLowerCase().includes(q)
+        m.description?.toLowerCase().includes(q)
     );
 
     const result = [];
     if (vendorHits.length > 0)
       result.push({ title: 'Vendors', data: vendorHits.map((v) => ({ type: 'vendor' as const, data: v })) });
     if (itemHits.length > 0)
-      result.push({ title: 'Menu Items', data: itemHits.map((m) => ({ type: 'item' as const, data: m })) });
+      result.push({ title: 'Menu Items', data: itemHits.map((m) => ({ type: 'item' as const, data: m, vendor: vendorMap[m.vendorId] })) });
     return result;
-  }, [query]);
+  }, [query, vendors, menuItems, vendorMap]);
 
   const goToVendor = (vendor: Vendor) =>
     navigation.navigate('VendorDetail', {
       id: vendor.id,
-      title: vendor.title,
-      subtitle: vendor.subtitle,
-      rating: vendor.rating,
+      title: vendor.name,
+      subtitle: vendor.area,
+      rating: vendor.rating ?? '0.0',
     });
-
-  const goToVendorFromItem = (item: MenuItem) => {
-    const vendor = VENDOR_MAP[item.vendorId];
-    if (vendor) goToVendor(vendor);
-  };
 
   const renderItem = ({ item }: { item: ResultSection }) => {
     if (item.type === 'vendor') {
@@ -83,10 +114,10 @@ export default function Search() {
           </View>
           <View style={styles.cardBody}>
             <View style={styles.cardTop}>
-              <Text style={styles.cardTitle}>{v.title}</Text>
-              <Text style={styles.cardRating}>⭐ {v.rating}</Text>
+              <Text style={styles.cardTitle}>{v.name}</Text>
+              <Text style={styles.cardRating}>⭐ {v.rating ?? '—'}</Text>
             </View>
-            <Text style={styles.cardSubtitle}>{v.subtitle}</Text>
+            <Text style={styles.cardSubtitle}>📍 {v.area}</Text>
             <View style={styles.cardMeta}>
               <Text style={styles.metaText}>🕐 {v.deliveryTime}</Text>
               <Text style={styles.metaDot}>·</Text>
@@ -100,11 +131,15 @@ export default function Search() {
     }
 
     const m = item.data;
-    const vendor = VENDOR_MAP[m.vendorId];
+    const vendor = item.vendor;
     return (
-      <TouchableOpacity style={styles.card} onPress={() => goToVendorFromItem(m)} activeOpacity={0.85}>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => vendor && goToVendor(vendor)}
+        activeOpacity={0.85}
+      >
         <View style={styles.iconBox}>
-          <Text style={styles.iconEmoji}>{CATEGORY_EMOJI[m.category] ?? '🏪'}</Text>
+          <Text style={styles.iconEmoji}>{vendor ? CATEGORY_EMOJI[vendor.category] ?? '🏪' : '🍽️'}</Text>
         </View>
         <View style={styles.cardBody}>
           <View style={styles.cardTop}>
@@ -114,9 +149,7 @@ export default function Search() {
           <Text style={styles.cardSubtitle}>{m.description}</Text>
           {vendor && (
             <View style={styles.cardMeta}>
-              <Text style={styles.metaText}>📍 {vendor.title}</Text>
-              <Text style={styles.metaDot}>·</Text>
-              <Text style={styles.categoryTag}>{m.category}</Text>
+              <Text style={styles.metaText}>📍 {vendor.name}</Text>
             </View>
           )}
         </View>
@@ -144,7 +177,11 @@ export default function Search() {
         )}
       </View>
 
-      {query.trim().length === 0 ? (
+      {loading ? (
+        <View style={styles.emptyState}>
+          <ActivityIndicator size="large" color="#0f766e" />
+        </View>
+      ) : query.trim().length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyIcon}>🔍</Text>
           <Text style={styles.emptyTitle}>Find anything</Text>

@@ -1,17 +1,26 @@
-import React from 'react';
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, FlatList, Image, ImageBackground } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, FlatList, Image, ImageBackground, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
 import IconGrid from '../components/IconGrid';
 import { HomeStackParamList } from '../types/navigation';
-import { VENDOR_BY_ID } from '../data/vendors';
 const restaurants = require('../assets/Icons/restaurants.png');
 const groceries = require('../assets/Icons/groceries.png');
 const pharmacies = require('../assets/Icons/pharmacies.png');
 const packages = require('../assets/Icons/packages.png');
 
 type NavProp = NativeStackNavigationProp<HomeStackParamList, 'HomeScreen'>;
+
+type Vendor = {
+  id: string;
+  name: string;
+  area: string;
+  rating: string;
+  image?: string;
+};
 
 const CATEGORIES = [
   { id: '1', label: 'Restaurants', icon: restaurants },
@@ -20,12 +29,20 @@ const CATEGORIES = [
   { id: '4', label: 'Packages', icon: packages },
 ];
 
-const FEATURED_IDS = ['r1', 'r2'];
-
 const BANNER_URI = 'https://images.unsplash.com/photo-1526367790999-0150786686a2?w=800&auto=format&fit=crop&q=80';
 
 export default function Home() {
   const navigation = useNavigation<NavProp>();
+  const [featured, setFeatured] = useState<Vendor[]>([]);
+  const [loadingFeatured, setLoadingFeatured] = useState(true);
+
+  useEffect(() => {
+    getDocs(collection(db, 'vendors')).then((snap) => {
+      const vendors = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Vendor));
+      setFeatured(vendors.slice(0, 10));
+      setLoadingFeatured(false);
+    });
+  }, []);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -58,34 +75,41 @@ export default function Home() {
           <Text style={styles.sectionTitle}>Featured 🌟</Text>
         </View>
 
-        <FlatList
-          data={FEATURED_IDS}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(id) => id}
-          renderItem={({ item: id }) => {
-            const vendor = VENDOR_BY_ID[id];
-            if (!vendor) return null;
-            return (
+        {loadingFeatured ? (
+          <View style={styles.featuredLoader}>
+            <ActivityIndicator size="small" color="#0f766e" />
+          </View>
+        ) : featured.length === 0 ? (
+          <Text style={styles.noVendors}>No vendors available yet</Text>
+        ) : (
+          <FlatList
+            data={featured}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(v) => v.id}
+            renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.card}
                 onPress={() => navigation.navigate('VendorDetail', {
-                  id: vendor.id,
-                  title: vendor.title,
-                  subtitle: vendor.subtitle,
-                  rating: vendor.rating,
+                  id: item.id,
+                  title: item.name,
+                  subtitle: item.area,
+                  rating: item.rating ?? '0.0',
                 })}
                 activeOpacity={0.85}
               >
-                <Image source={{ uri: vendor.image }} style={styles.cardImage} />
+                {item.image
+                  ? <Image source={{ uri: item.image }} style={styles.cardImage} />
+                  : <View style={[styles.cardImage, styles.cardImagePlaceholder]} />
+                }
                 <View style={styles.cardRatingRow}>
-                  <Text style={styles.cardRating}>⭐ {vendor.rating}</Text>
+                  <Text style={styles.cardRating}>⭐ {item.rating ?? '—'}</Text>
                 </View>
-                <Text style={styles.cardTitle}>{vendor.title}</Text>
+                <Text style={styles.cardTitle}>{item.name}</Text>
               </TouchableOpacity>
-            );
-          }}
-        />
+            )}
+          />
+        )}
 
         <View style={{ height: 16 }} />
       </ScrollView>
@@ -113,9 +137,13 @@ const styles = StyleSheet.create({
   sectionHeader: { marginBottom: 8 },
   sectionTitle: { fontSize: 16, fontWeight: '700' },
 
-  card: { width: 260, marginRight: 12, borderRadius: 10, backgroundColor: '#fff', elevation: 2, paddingBottom: 10 },
+  featuredLoader: { height: 160, alignItems: 'center', justifyContent: 'center' },
+  noVendors: { color: '#9ca3af', fontSize: 13, marginBottom: 12 },
+
+  card: { width: 200, marginRight: 12, borderRadius: 10, backgroundColor: '#fff', elevation: 2, paddingBottom: 10 },
   cardImage: { height: 120, borderTopLeftRadius: 10, borderTopRightRadius: 10, backgroundColor: '#f3f4f6' },
+  cardImagePlaceholder: { backgroundColor: '#e5e7eb' },
   cardRatingRow: { paddingHorizontal: 8, paddingTop: 8 },
   cardRating: { fontSize: 12, color: '#374151' },
-  cardTitle: { fontWeight: '700', paddingHorizontal: 8, paddingTop: 2 },
+  cardTitle: { fontWeight: '700', paddingHorizontal: 8, paddingTop: 2, fontSize: 13 },
 });

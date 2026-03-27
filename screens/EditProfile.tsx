@@ -6,14 +6,18 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../types/navigation';
-import { useProfile } from '../context/ProfileContext';
+import { useAuth } from '../context/AuthContext';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'EditProfile'>;
 
 export default function EditProfile({ navigation }: Props) {
-  const { name, phone, email, updateProfile } = useProfile();
-  const [form, setForm] = useState({ name, phone, email });
+  const { profile, updateProfile } = useAuth();
+  const [form, setForm] = useState({
+    name: profile?.name ?? '',
+    phone: profile?.phone ?? '',
+  });
   const [errors, setErrors] = useState<Partial<typeof form>>({});
+  const [saving, setSaving] = useState(false);
 
   const set = (key: keyof typeof form) => (val: string) => {
     setForm((f) => ({ ...f, [key]: val }));
@@ -23,17 +27,20 @@ export default function EditProfile({ navigation }: Props) {
   const validate = () => {
     const e: Partial<typeof form> = {};
     if (!form.name.trim()) e.name = 'Name is required';
-    if (!form.phone.trim()) e.phone = 'Phone is required';
-    else if (!/^\+?[\d\s-]{7,15}$/.test(form.phone.trim())) e.phone = 'Enter a valid phone number';
-    if (form.email && !/\S+@\S+\.\S+/.test(form.email)) e.email = 'Enter a valid email';
+    if (form.phone.trim() && !/^\+?[\d\s-]{7,15}$/.test(form.phone.trim())) e.phone = 'Enter a valid phone number';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const save = () => {
+  const save = async () => {
     if (!validate()) return;
-    updateProfile({ name: form.name.trim(), phone: form.phone.trim(), email: form.email.trim() });
-    navigation.goBack();
+    setSaving(true);
+    try {
+      await updateProfile({ name: form.name.trim(), phone: form.phone.trim() });
+      navigation.goBack();
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -41,12 +48,12 @@ export default function EditProfile({ navigation }: Props) {
       <ScrollView style={styles.container} contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <Field label="Full Name" value={form.name} onChangeText={set('name')} placeholder="e.g. Chidi Okeke" error={errors.name} />
         <Field label="Phone Number" value={form.phone} onChangeText={set('phone')} placeholder="e.g. 08012345678" keyboardType="phone-pad" error={errors.phone} />
-        <Field label="Email (optional)" value={form.email} onChangeText={set('email')} placeholder="e.g. chidi@email.com" keyboardType="email-address" error={errors.email} />
+        <Text style={styles.emailNote}>Email: {profile?.email}</Text>
       </ScrollView>
 
       <SafeAreaView edges={['bottom']} style={styles.footer}>
-        <TouchableOpacity style={styles.saveBtn} onPress={save}>
-          <Text style={styles.saveBtnText}>Save Changes</Text>
+        <TouchableOpacity style={styles.saveBtn} onPress={save} disabled={saving}>
+          <Text style={styles.saveBtnText}>{saving ? 'Saving…' : 'Save Changes'}</Text>
         </TouchableOpacity>
       </SafeAreaView>
     </KeyboardAvoidingView>
@@ -71,6 +78,7 @@ const styles = StyleSheet.create({
   input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, padding: 12, fontSize: 14, color: '#111827' },
   inputError: { borderColor: '#ef4444' },
   errorText: { color: '#ef4444', fontSize: 12, marginTop: 4 },
+  emailNote: { fontSize: 13, color: '#9ca3af', marginTop: 4 },
   footer: { paddingHorizontal: 16, paddingBottom: 12, backgroundColor: '#fff', borderTopWidth: 1, borderColor: '#f3f4f6' },
   saveBtn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginTop: 12 },
   saveBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },

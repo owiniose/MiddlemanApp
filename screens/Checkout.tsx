@@ -9,6 +9,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useCart } from '../context/CartContext';
 import { useOrders } from '../context/OrdersContext';
 import { useProfile } from '../context/ProfileContext';
+import { useAuth } from '../context/AuthContext';
 import { RootStackParamList } from '../types/navigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Checkout'>;
@@ -19,10 +20,11 @@ const PAYMENT_METHODS = ['Cash on Delivery', 'Bank Transfer', 'Card'];
 export default function Checkout({ navigation }: Props) {
   const { items, vendorId, vendorName, total, clearCart } = useCart();
   const { addOrder } = useOrders();
-  const { phone: savedPhone, addresses } = useProfile();
+  const { addresses } = useProfile();
+  const { user, profile } = useAuth();
 
   const [address, setAddress] = useState('');
-  const [phone, setPhone] = useState(savedPhone);
+  const [phone, setPhone] = useState(profile?.phone ?? '');
   const [payment, setPayment] = useState('Cash on Delivery');
   const [errors, setErrors] = useState<{ address?: string; phone?: string }>({});
   const [addressModal, setAddressModal] = useState(false);
@@ -36,18 +38,22 @@ export default function Checkout({ navigation }: Props) {
     return Object.keys(e).length === 0;
   };
 
-  const placeOrder = () => {
+  const placeOrder = async () => {
     if (!validate()) return;
-    const orderId = addOrder({
-      vendorId: vendorId!,
-      vendorName: vendorName!,
-      items,
-      subtotal: total,
-      deliveryFee: DELIVERY_FEE,
-      total: total + DELIVERY_FEE,
-      address: address.trim(),
-      phone: phone.trim(),
-    });
+    const orderId = await addOrder(
+      {
+        vendorId: vendorId!,
+        vendorName: vendorName!,
+        items,
+        subtotal: total,
+        deliveryFee: DELIVERY_FEE,
+        total: total + DELIVERY_FEE,
+        address: address.trim(),
+        phone: phone.trim(),
+      },
+      user?.uid ?? '',
+      profile?.name ?? 'Customer',
+    );
     clearCart();
     navigation.replace('OrderConfirmation', { orderId, vendorName: vendorName!, total: total + DELIVERY_FEE });
   };
