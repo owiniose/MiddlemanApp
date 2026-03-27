@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   View, TextInput, TouchableOpacity, StyleSheet,
   ScrollView, ActivityIndicator, Switch, Alert,
+  KeyboardAvoidingView, Platform,
 } from 'react-native';
 import Text from '../../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -78,7 +79,12 @@ export default function VendorStoreSettings() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}
+      >
+      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <Text style={styles.header}>Store Settings</Text>
 
         {/* Account info */}
@@ -152,8 +158,9 @@ export default function VendorStoreSettings() {
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>
 
-        <View style={{ height: 24 }} />
+        <View style={{ height: 40 }} />
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

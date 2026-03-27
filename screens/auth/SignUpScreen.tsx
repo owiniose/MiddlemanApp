@@ -64,7 +64,7 @@ export default function SignUpScreen({ onGoLogin }: Props) {
       </View>
 
       {/* White form card */}
-      <KeyboardAvoidingView style={styles.cardWrap} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView style={styles.cardWrap} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}>
         <ScrollView contentContainerStyle={styles.card} keyboardShouldPersistTaps="handled">
           <Text style={styles.title}>Create an account</Text>
 
