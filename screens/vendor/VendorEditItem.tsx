@@ -8,21 +8,22 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { doc, updateDoc } from 'firebase/firestore';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { db } from '../../config/firebase';
-import { useAuth } from '../../context/AuthContext';
 import { VendorStackParamList } from '../../types/navigation';
 import ImagePickerField from '../../components/ImagePickerField';
+import OptionGroupsBuilder from '../../components/OptionGroupsBuilder';
+import { OptionGroup } from '../../context/CartContext';
 
 type Props = NativeStackScreenProps<VendorStackParamList, 'VendorEditItem'>;
 
 export default function VendorEditItem({ route, navigation }: Props) {
-  const { id, name: initName, description: initDesc, price: initPrice, section: initSection, image: initImage } = route.params;
-  const { profile } = useAuth();
+  const { id, name: initName, description: initDesc, price: initPrice, section: initSection, image: initImage, options: initOptions } = route.params;
 
   const [name, setName] = useState(initName);
   const [description, setDescription] = useState(initDesc);
   const [price, setPrice] = useState(String(initPrice));
   const [section, setSection] = useState(initSection);
   const [imageUrl, setImageUrl] = useState<string | null>(initImage || null);
+  const [options, setOptions] = useState<OptionGroup[]>(initOptions ?? []);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
@@ -46,6 +47,7 @@ export default function VendorEditItem({ route, navigation }: Props) {
         price: Number(price),
         section: section.trim(),
         image: imageUrl ?? null,
+        options: options.filter((g) => g.name.trim() && g.choices.length > 0),
       });
       navigation.goBack();
     } catch {
@@ -74,6 +76,9 @@ export default function VendorEditItem({ route, navigation }: Props) {
         <Field label="Description" value={description} onChangeText={setDescription} placeholder="Short description of the item" multiline error={errors.description} />
         <Field label="Price (₦)" value={price} onChangeText={setPrice} placeholder="e.g. 1800" keyboardType="numeric" error={errors.price} />
         <Field label="Section" value={section} onChangeText={setSection} placeholder="e.g. Popular, Sides, Drinks" error={errors.section} />
+
+        <View style={styles.divider} />
+        <OptionGroupsBuilder groups={options} onChange={setOptions} />
 
         <View style={{ height: 24 }} />
       </ScrollView>
@@ -113,6 +118,7 @@ const styles = StyleSheet.create({
   inputMulti: { minHeight: 80, textAlignVertical: 'top' },
   inputError: { borderColor: '#ef4444' },
   fieldError: { color: '#ef4444', fontSize: 12, marginTop: 4 },
+  divider: { height: 1, backgroundColor: '#e5e7eb', marginVertical: 20 },
   footer: { paddingHorizontal: 16, paddingBottom: 12, backgroundColor: '#fff', borderTopWidth: 1, borderColor: '#f3f4f6' },
   saveBtn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginTop: 12 },
   saveBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },

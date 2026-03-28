@@ -11,6 +11,8 @@ import { VendorStackParamList } from '../../types/navigation';
 
 type Props = NativeStackScreenProps<VendorStackParamList, 'VendorMenu'>;
 
+import { OptionGroup } from '../../context/CartContext';
+
 type MenuItem = {
   id: string;
   name: string;
@@ -19,6 +21,7 @@ type MenuItem = {
   section: string;
   image?: string;
   available: boolean;
+  options?: OptionGroup[];
 };
 
 export default function VendorMenu({ navigation }: Props) {
@@ -89,6 +92,7 @@ export default function VendorMenu({ navigation }: Props) {
                     price: item.price,
                     section: item.section,
                     image: item.image ?? '',
+                    options: item.options ?? [],
                   })}
                   style={styles.actionBtn}
                 >

@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(node scripts/seed-chicken-republic.mjs)",
+      "Bash(node scripts/seed-pizza-palace.mjs)"
     ]
   }
 }

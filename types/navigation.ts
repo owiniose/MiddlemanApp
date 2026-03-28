@@ -56,6 +56,7 @@ export type VendorStackParamList = {
     price: number;
     section: string;
     image: string;
+    options: import('../context/CartContext').OptionGroup[];
   };
   VendorStoreSettings: undefined;
 };

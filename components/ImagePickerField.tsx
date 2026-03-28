@@ -3,8 +3,8 @@ import { View, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 're
 import Text from './Text';
 import * as ImagePicker from 'expo-image-picker';
 
-const CLOUDINARY_CLOUD = 'dlpfarf9b';
-const CLOUDINARY_PRESET = 'middleman_app';
+const CLOUDINARY_CLOUD = process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD!;
+const CLOUDINARY_PRESET = process.env.EXPO_PUBLIC_CLOUDINARY_PRESET!;
 
 async function uploadImage(base64Data: string): Promise<string> {
   const response = await fetch(

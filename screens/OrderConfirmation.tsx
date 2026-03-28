@@ -15,7 +15,7 @@ export default function OrderConfirmation({ route, navigation }: Props) {
       <View style={styles.content}>
         <Text style={styles.checkmark}>✅</Text>
         <Text style={styles.title}>Order Placed!</Text>
-        <Text style={styles.subtitle}>Your order from {vendorName} has been received and is being prepared.</Text>
+        <Text style={styles.subtitle}>Your order from {vendorName} has been received. We'll notify you when the vendor accepts it.</Text>
 
         <View style={styles.infoCard}>
           <View style={styles.infoRow}>
@@ -29,7 +29,7 @@ export default function OrderConfirmation({ route, navigation }: Props) {
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Status</Text>
             <View style={styles.statusBadge}>
-              <Text style={styles.statusText}>Preparing</Text>
+              <Text style={styles.statusText}>Pending</Text>
             </View>
           </View>
         </View>
@@ -39,7 +39,10 @@ export default function OrderConfirmation({ route, navigation }: Props) {
         <TouchableOpacity
           style={styles.trackBtn}
           onPress={() => {
-            navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Main', state: { index: 2, routes: [{ name: 'Orders' }] } }],
+            });
           }}
         >
           <Text style={styles.trackBtnText}>Track Order in Orders Tab</Text>

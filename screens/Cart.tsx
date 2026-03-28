@@ -26,7 +26,7 @@ export default function Cart({ navigation }: Props) {
     <View style={styles.container}>
       <FlatList
         data={items}
-        keyExtractor={(i) => i.id}
+        keyExtractor={(i) => i.cartKey}
         contentContainerStyle={styles.list}
         ListHeaderComponent={
           <View style={styles.vendorRow}>
@@ -52,31 +52,59 @@ export default function Cart({ navigation }: Props) {
             </View>
           </View>
         }
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            {item.image
-              ? <Image source={{ uri: item.image }} style={styles.cardImage} />
-              : <View style={[styles.cardImage, styles.cardImagePlaceholder]} />
-            }
-            <View style={styles.cardInfo}>
-              <Text style={styles.itemName}>{item.name}</Text>
-              <Text style={styles.itemDesc} numberOfLines={1}>{item.description}</Text>
-              <Text style={styles.itemPrice}>₦{item.price.toLocaleString()}</Text>
+        renderItem={({ item }) => {
+          const optionsExtra = (item.selectedOptions ?? []).reduce(
+            (s, g) => s + g.choices.reduce((cs, c) => cs + c.price, 0), 0,
+          );
+          const effectivePrice = item.price + optionsExtra;
+          const optionTags = (item.selectedOptions ?? []).flatMap((g) =>
+            g.choices.map((c) => c.name),
+          );
+
+          return (
+            <View style={styles.card}>
+              {item.image
+                ? <Image source={{ uri: item.image }} style={styles.cardImage} />
+                : <View style={[styles.cardImage, styles.cardImagePlaceholder]} />
+              }
+              <View style={styles.cardInfo}>
+                <Text style={styles.itemName}>{item.name}</Text>
+                {optionTags.length > 0 && (
+                  <View style={styles.tagsRow}>
+                    {optionTags.map((tag, i) => (
+                      <View key={i} style={styles.tag}>
+                        <Text style={styles.tagText}>{tag}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                <Text style={styles.itemPrice}>₦{effectivePrice.toLocaleString()}</Text>
+              </View>
+              <View style={styles.qtyControl}>
+                <TouchableOpacity style={styles.qtyBtn} onPress={() => removeItem(item.cartKey)}>
+                  <Text style={styles.qtyBtnText}>−</Text>
+                </TouchableOpacity>
+                <Text style={styles.qtyCount}>{item.qty}</Text>
+                <TouchableOpacity
+                  style={[styles.qtyBtn, styles.qtyBtnAdd]}
+                  onPress={() => addItem({
+                    id: item.id,
+                    cartKey: item.cartKey,
+                    name: item.name,
+                    description: item.description,
+                    price: item.price,
+                    vendorId: item.vendorId,
+                    vendorName: item.vendorName,
+                    image: item.image,
+                    selectedOptions: item.selectedOptions,
+                  })}
+                >
+                  <Text style={[styles.qtyBtnText, styles.qtyBtnAddText]}>+</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={styles.qtyControl}>
-              <TouchableOpacity style={styles.qtyBtn} onPress={() => removeItem(item.id)}>
-                <Text style={styles.qtyBtnText}>−</Text>
-              </TouchableOpacity>
-              <Text style={styles.qtyCount}>{item.qty}</Text>
-              <TouchableOpacity
-                style={[styles.qtyBtn, styles.qtyBtnAdd]}
-                onPress={() => addItem({ id: item.id, name: item.name, description: item.description, price: item.price, vendorId: item.vendorId, vendorName: item.vendorName, image: item.image })}
-              >
-                <Text style={[styles.qtyBtnText, styles.qtyBtnAddText]}>+</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
+          );
+        }}
       />
 
       <SafeAreaView edges={['bottom']} style={styles.footer}>
@@ -104,8 +132,10 @@ const styles = StyleSheet.create({
   cardImage: { width: 64, height: 64, borderRadius: 10, backgroundColor: '#f3f4f6' },
   cardImagePlaceholder: { backgroundColor: '#e5e7eb' },
   cardInfo: { flex: 1 },
-  itemName: { fontWeight: '700', fontSize: 14, color: '#111827', marginBottom: 2 },
-  itemDesc: { color: '#6b7280', fontSize: 12, marginBottom: 4 },
+  itemName: { fontWeight: '700', fontSize: 14, color: '#111827', marginBottom: 4 },
+  tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginBottom: 4 },
+  tag: { backgroundColor: '#f3f4f6', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 },
+  tagText: { fontSize: 11, color: '#374151' },
   itemPrice: { fontWeight: '700', color: '#0f766e', fontSize: 14 },
 
   qtyControl: { flexDirection: 'row', alignItems: 'center', gap: 8 },

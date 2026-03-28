@@ -11,6 +11,8 @@ import { db } from '../../config/firebase';
 import { useAuth } from '../../context/AuthContext';
 import { VendorStackParamList } from '../../types/navigation';
 import ImagePickerField from '../../components/ImagePickerField';
+import OptionGroupsBuilder from '../../components/OptionGroupsBuilder';
+import { OptionGroup } from '../../context/CartContext';
 
 type Props = NativeStackScreenProps<VendorStackParamList, 'VendorAddItem'>;
 
@@ -21,6 +23,7 @@ export default function VendorAddItem({ navigation }: Props) {
   const [price, setPrice] = useState('');
   const [section, setSection] = useState('');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [options, setOptions] = useState<OptionGroup[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
@@ -45,6 +48,7 @@ export default function VendorAddItem({ navigation }: Props) {
         price: Number(price),
         section: section.trim(),
         image: imageUrl ?? null,
+        options: options.filter((g) => g.name.trim() && g.choices.length > 0),
         available: true,
         createdAt: serverTimestamp(),
       });
@@ -75,6 +79,9 @@ export default function VendorAddItem({ navigation }: Props) {
         <Field label="Description" value={description} onChangeText={setDescription} placeholder="Short description of the item" multiline error={errors.description} />
         <Field label="Price (₦)" value={price} onChangeText={setPrice} placeholder="e.g. 1800" keyboardType="numeric" error={errors.price} />
         <Field label="Section" value={section} onChangeText={setSection} placeholder="e.g. Popular, Sides, Drinks" error={errors.section} />
+
+        <View style={styles.divider} />
+        <OptionGroupsBuilder groups={options} onChange={setOptions} />
 
         <View style={{ height: 24 }} />
       </ScrollView>
@@ -114,6 +121,7 @@ const styles = StyleSheet.create({
   inputMulti: { minHeight: 80, textAlignVertical: 'top' },
   inputError: { borderColor: '#ef4444' },
   fieldError: { color: '#ef4444', fontSize: 12, marginTop: 4 },
+  divider: { height: 1, backgroundColor: '#e5e7eb', marginVertical: 20 },
   footer: { paddingHorizontal: 16, paddingBottom: 12, backgroundColor: '#fff', borderTopWidth: 1, borderColor: '#f3f4f6' },
   saveBtn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginTop: 12 },
   saveBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },

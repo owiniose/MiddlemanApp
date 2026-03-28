@@ -21,7 +21,7 @@ export type Order = {
 
 type OrdersContextType = {
   orders: Order[];
-  addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'status'>, customerId: string, customerName: string) => Promise<string>;
+  addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'status'>, customerId: string, customerName: string, extras?: { paymentMethod?: string; paymentReference?: string }) => Promise<string>;
   cancelOrder: (orderId: string) => void;
   listenToOrders: (customerId: string) => () => void;
 };
@@ -31,13 +31,14 @@ const OrdersContext = createContext<OrdersContextType | null>(null);
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
   const [orders, setOrders] = useState<Order[]>([]);
 
-  const addOrder = async (order: Omit<Order, 'id' | 'createdAt' | 'status'>, customerId: string, customerName: string) => {
+  const addOrder = async (order: Omit<Order, 'id' | 'createdAt' | 'status'>, customerId: string, customerName: string, extras?: { paymentMethod?: string; paymentReference?: string }) => {
     const docRef = await addDoc(collection(db, 'orders'), {
       ...order,
       customerId,
       customerName,
       status: 'Pending',
       createdAt: serverTimestamp(),
+      ...extras,
     });
     return docRef.id;
   };

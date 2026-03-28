@@ -143,10 +143,11 @@ export default function AiAssistant({ onClose }: { onClose?: () => void }) {
         ...prev,
         { id: (Date.now() + 1).toString(), role: 'assistant', content: reply },
       ]);
-    } catch {
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
       setMessages((prev) => [
         ...prev,
-        { id: (Date.now() + 1).toString(), role: 'assistant', content: "Sorry, I'm having trouble connecting right now. Please try again! 😅" },
+        { id: (Date.now() + 1).toString(), role: 'assistant', content: `Error: ${msg}` },
       ]);
     } finally {
       setLoading(false);

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
   View, StyleSheet, TextInput, TouchableOpacity,
-  ScrollView, KeyboardAvoidingView, Platform, Modal, FlatList,
+  ScrollView, KeyboardAvoidingView, Platform, Modal, FlatList, ActivityIndicator,
 } from 'react-native';
+import { PayWithFlutterwave } from 'flutterwave-react-native';
 import Text from '../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +18,7 @@ import { getDeliveryFee, getDeliveryZone, CITY_FEE, OUTSKIRTS_FEE } from '../uti
 type Props = NativeStackScreenProps<RootStackParamList, 'Checkout'>;
 
 const PAYMENT_METHODS = ['Cash on Delivery', 'Bank Transfer', 'Card'];
+const FLUTTERWAVE_PUBLIC_KEY = process.env.EXPO_PUBLIC_FLUTTERWAVE_PUBLIC_KEY!;
 
 export default function Checkout({ navigation }: Props) {
   const { items, vendorId, vendorName, total, clearCart } = useCart();
@@ -29,6 +31,7 @@ export default function Checkout({ navigation }: Props) {
   const [payment, setPayment] = useState('Cash on Delivery');
   const [errors, setErrors] = useState<{ address?: string; phone?: string }>({});
   const [addressModal, setAddressModal] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
 
   const deliveryFee = getDeliveryFee(address);
   const deliveryZone = address.trim() ? getDeliveryZone(address) : null;
@@ -42,7 +45,7 @@ export default function Checkout({ navigation }: Props) {
     return Object.keys(e).length === 0;
   };
 
-  const placeOrder = async () => {
+  const placeOrder = async (paymentReference?: string) => {
     if (!validate()) return;
     const orderId = await addOrder(
       {
@@ -57,9 +60,20 @@ export default function Checkout({ navigation }: Props) {
       },
       user?.uid ?? '',
       profile?.name ?? 'Customer',
+      { paymentMethod: payment, paymentReference },
     );
     clearCart();
     navigation.replace('OrderConfirmation', { orderId, vendorName: vendorName!, total: total + deliveryFee });
+  };
+
+  const handleFlutterwaveRedirect = ({ status, transaction_id }: { status: string; transaction_id: string }) => {
+    if (status === 'successful') {
+      placeOrder(transaction_id);
+    } else if (status === 'cancelled') {
+      setPaymentError('Payment was cancelled.');
+    } else {
+      setPaymentError('Payment failed. Please try again.');
+    }
   };
 
   return (
@@ -122,12 +136,26 @@ export default function Checkout({ navigation }: Props) {
         <Text style={styles.sectionTitle}>Order Summary</Text>
         <View style={styles.summaryCard}>
           <Text style={styles.vendorName}>{vendorName}</Text>
-          {items.map((item) => (
-            <View key={item.id} style={styles.summaryRow}>
-              <Text style={styles.summaryItem}>{item.qty}× {item.name}</Text>
-              <Text style={styles.summaryPrice}>₦{(item.price * item.qty).toLocaleString()}</Text>
-            </View>
-          ))}
+          {items.map((item) => {
+            const optionsExtra = (item.selectedOptions ?? []).reduce(
+              (s, g) => s + g.choices.reduce((cs, c) => cs + c.price, 0), 0,
+            );
+            const effectivePrice = item.price + optionsExtra;
+            const optionTags = (item.selectedOptions ?? []).flatMap((g) =>
+              g.choices.map((c) => c.name),
+            );
+            return (
+              <View key={item.cartKey} style={styles.summaryItemBlock}>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryItem}>{item.qty}× {item.name}</Text>
+                  <Text style={styles.summaryPrice}>₦{(effectivePrice * item.qty).toLocaleString()}</Text>
+                </View>
+                {optionTags.length > 0 && (
+                  <Text style={styles.summaryOptions}>{optionTags.join(', ')}</Text>
+                )}
+              </View>
+            );
+          })}
           <View style={styles.divider} />
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Subtotal</Text>
@@ -147,9 +175,40 @@ export default function Checkout({ navigation }: Props) {
       </ScrollView>
 
       <SafeAreaView edges={['bottom']} style={styles.footer}>
-        <TouchableOpacity style={styles.placeOrderBtn} onPress={placeOrder}>
-          <Text style={styles.placeOrderText}>Place Order · ₦{(total + deliveryFee).toLocaleString()}</Text>
-        </TouchableOpacity>
+        {paymentError ? <Text style={styles.paymentErrorText}>{paymentError}</Text> : null}
+        {payment === 'Cash on Delivery' ? (
+          <TouchableOpacity style={styles.placeOrderBtn} onPress={() => placeOrder()}>
+            <Text style={styles.placeOrderText}>Place Order · ₦{(total + deliveryFee).toLocaleString()}</Text>
+          </TouchableOpacity>
+        ) : (
+          <PayWithFlutterwave
+            onRedirect={handleFlutterwaveRedirect}
+            options={{
+              tx_ref: `MW-${Date.now()}`,
+              authorization: FLUTTERWAVE_PUBLIC_KEY,
+              customer: {
+                email: user?.email ?? '',
+                name: profile?.name ?? 'Customer',
+                phonenumber: phone.trim(),
+              },
+              amount: total + deliveryFee,
+              currency: 'NGN',
+              payment_options: payment === 'Card' ? 'card' : 'banktransfer',
+            }}
+            customButton={(props) => (
+              <TouchableOpacity
+                style={[styles.placeOrderBtn, props.isInitializing && styles.placeOrderBtnLoading]}
+                onPress={() => { setPaymentError(''); if (validate()) props.onPress(); }}
+                disabled={props.disabled || props.isInitializing}
+              >
+                {props.isInitializing
+                  ? <ActivityIndicator color="#fff" />
+                  : <Text style={styles.placeOrderText}>Pay ₦{(total + deliveryFee).toLocaleString()}</Text>
+                }
+              </TouchableOpacity>
+            )}
+          />
+        )}
       </SafeAreaView>
 
       {/* Saved address picker */}
@@ -214,7 +273,9 @@ const styles = StyleSheet.create({
   summaryCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, gap: 8 },
   vendorName: { fontWeight: '700', fontSize: 14, marginBottom: 4, color: '#0f766e' },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  summaryItemBlock: { gap: 2 },
   summaryItem: { fontSize: 13, color: '#374151', flex: 1 },
+  summaryOptions: { fontSize: 11, color: '#9ca3af', marginLeft: 18, marginBottom: 2 },
   summaryPrice: { fontSize: 13, fontWeight: '500' },
   summaryLabel: { fontSize: 13, color: '#6b7280' },
   summaryValue: { fontSize: 13 },
@@ -225,7 +286,9 @@ const styles = StyleSheet.create({
 
   footer: { paddingHorizontal: 16, paddingBottom: 12, backgroundColor: '#fff', borderTopWidth: 1, borderColor: '#f3f4f6' },
   placeOrderBtn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 12 },
+  placeOrderBtnLoading: { opacity: 0.7 },
   placeOrderText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  paymentErrorText: { color: '#ef4444', fontSize: 13, textAlign: 'center', marginTop: 8 },
 
   modalOverlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' },
   modalSheet: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, maxHeight: '60%' },
