@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Vibration } from 'react-native';
 import Text from '../../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../context/AuthContext';
 import { sendPushNotification } from '../../utils/notifications';
+import { Audio } from 'expo-av';
 
 type OrderStatus = 'Pending' | 'Preparing' | 'On the way' | 'Delivered' | 'Cancelled';
 
@@ -62,10 +63,27 @@ async function notifyCustomer(customerId: string, status: OrderStatus, vendorNam
   }
 }
 
+async function playNewOrderSound() {
+  try {
+    await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
+    const { sound } = await Audio.Sound.createAsync(
+      require('../../assets/notification.mp3'),
+      { shouldPlay: true, volume: 1.0 },
+    );
+    sound.setOnPlaybackStatusUpdate((status) => {
+      if (status.isLoaded && status.didJustFinish) sound.unloadAsync();
+    });
+  } catch {
+    // Sound failure should never break the order flow
+  }
+}
+
 export default function VendorOrders() {
   const { profile } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const knownIds = useRef<Set<string>>(new Set());
+  const isFirstLoad = useRef(true);
 
   useEffect(() => {
     if (!profile?.vendorId) return;
@@ -73,6 +91,21 @@ export default function VendorOrders() {
     const unsub = onSnapshot(q, (snap) => {
       const fetched = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Order));
       fetched.sort((a, b) => (b.createdAt?.toMillis?.() ?? 0) - (a.createdAt?.toMillis?.() ?? 0));
+
+      if (isFirstLoad.current) {
+        // Populate known IDs silently on first load
+        fetched.forEach((o) => knownIds.current.add(o.id));
+        isFirstLoad.current = false;
+      } else {
+        // Check for genuinely new orders
+        const newOrders = fetched.filter((o) => !knownIds.current.has(o.id));
+        if (newOrders.length > 0) {
+          newOrders.forEach((o) => knownIds.current.add(o.id));
+          playNewOrderSound();
+          Vibration.vibrate([0, 400, 200, 400]);
+        }
+      }
+
       setOrders(fetched);
       setLoading(false);
     });

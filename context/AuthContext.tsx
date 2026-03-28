@@ -71,6 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         minOrder: '₦500',
         rating: '0.0',
         open: true,
+        approved: false,
         ownerId: cred.user.uid,
         createdAt: serverTimestamp(),
       });

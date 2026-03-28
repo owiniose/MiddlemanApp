@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import Text from '../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -44,6 +45,8 @@ const CATEGORY_EMOJI: Record<string, string> = {
   Packages: '📦',
 };
 
+const CATEGORIES = ['All', 'Restaurants', 'Shops', 'Pharmacies', 'Packages'] as const;
+
 type ResultSection =
   | { type: 'vendor'; data: Vendor }
   | { type: 'item'; data: MenuItem; vendor?: Vendor };
@@ -54,13 +57,16 @@ export default function Search() {
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [category, setCategory] = useState<string>('All');
+  const [openOnly, setOpenOnly] = useState(false);
+  const [topRated, setTopRated] = useState(false);
 
   useEffect(() => {
     Promise.all([
       getDocs(collection(db, 'vendors')),
       getDocs(collection(db, 'menuItems')),
     ]).then(([vendorSnap, menuSnap]) => {
-      setVendors(vendorSnap.docs.map((d) => ({ id: d.id, ...d.data() } as Vendor)));
+      setVendors(vendorSnap.docs.map((d) => ({ id: d.id, ...d.data() } as Vendor)).filter((v: any) => v.approved !== false));
       setMenuItems(menuSnap.docs.map((d) => ({ id: d.id, ...d.data() } as MenuItem)));
       setLoading(false);
     });
@@ -71,22 +77,36 @@ export default function Search() {
     [vendors]
   );
 
+  const hasFilter = category !== 'All' || openOnly || topRated;
+
   const sections = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return [];
+    if (!q && !hasFilter) return [];
 
-    const vendorHits = vendors.filter(
-      (v) =>
+    let vendorHits = vendors;
+    if (q) {
+      vendorHits = vendorHits.filter((v) =>
         v.name.toLowerCase().includes(q) ||
         v.area.toLowerCase().includes(q) ||
         v.category.toLowerCase().includes(q)
-    );
+      );
+    }
+    if (category !== 'All') vendorHits = vendorHits.filter((v) => v.category === category);
+    if (openOnly) vendorHits = vendorHits.filter((v) => v.open !== false);
+    if (topRated) vendorHits = [...vendorHits].sort((a, b) => parseFloat(b.rating ?? '0') - parseFloat(a.rating ?? '0'));
 
-    const itemHits = menuItems.filter(
-      (m) =>
+    const filteredVendorIds = new Set(vendorHits.map((v) => v.id));
+
+    let itemHits: MenuItem[] = [];
+    if (q) {
+      itemHits = menuItems.filter((m) =>
         m.name.toLowerCase().includes(q) ||
         m.description?.toLowerCase().includes(q)
-    );
+      );
+      if (category !== 'All' || openOnly) {
+        itemHits = itemHits.filter((m) => filteredVendorIds.has(m.vendorId));
+      }
+    }
 
     const result = [];
     if (vendorHits.length > 0)
@@ -94,7 +114,7 @@ export default function Search() {
     if (itemHits.length > 0)
       result.push({ title: 'Menu Items', data: itemHits.map((m) => ({ type: 'item' as const, data: m, vendor: vendorMap[m.vendorId] })) });
     return result;
-  }, [query, vendors, menuItems, vendorMap]);
+  }, [query, category, openOnly, topRated, vendors, menuItems, vendorMap, hasFilter]);
 
   const goToVendor = (vendor: Vendor) =>
     navigation.navigate('VendorDetail', {
@@ -177,11 +197,39 @@ export default function Search() {
         )}
       </View>
 
+      {/* Filter chips */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
+        {CATEGORIES.map((cat) => (
+          <TouchableOpacity
+            key={cat}
+            style={[styles.chip, category === cat && styles.chipActive]}
+            onPress={() => setCategory(cat)}
+            activeOpacity={0.75}
+          >
+            <Text style={[styles.chipText, category === cat && styles.chipTextActive]}>{cat}</Text>
+          </TouchableOpacity>
+        ))}
+        <TouchableOpacity
+          style={[styles.chip, openOnly && styles.chipActive]}
+          onPress={() => setOpenOnly((v) => !v)}
+          activeOpacity={0.75}
+        >
+          <Text style={[styles.chipText, openOnly && styles.chipTextActive]}>Open now</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.chip, topRated && styles.chipActive]}
+          onPress={() => setTopRated((v) => !v)}
+          activeOpacity={0.75}
+        >
+          <Text style={[styles.chipText, topRated && styles.chipTextActive]}>Ratings {topRated ? '▲' : '▾'}</Text>
+        </TouchableOpacity>
+      </ScrollView>
+
       {loading ? (
         <View style={styles.emptyState}>
           <ActivityIndicator size="large" color="#0f766e" />
         </View>
-      ) : query.trim().length === 0 ? (
+      ) : !query.trim() && !hasFilter ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyIcon}>🔍</Text>
           <Text style={styles.emptyTitle}>Find anything</Text>
@@ -191,7 +239,7 @@ export default function Search() {
         <View style={styles.emptyState}>
           <Text style={styles.emptyIcon}>😕</Text>
           <Text style={styles.emptyTitle}>No results</Text>
-          <Text style={styles.emptySubtitle}>Try a different search term</Text>
+          <Text style={styles.emptySubtitle}>Try a different search term or filter</Text>
         </View>
       ) : (
         <SectionList
@@ -216,6 +264,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     margin: 16,
+    marginBottom: 10,
     paddingHorizontal: 12,
     backgroundColor: '#f3f4f6',
     borderRadius: 12,
@@ -224,6 +273,16 @@ const styles = StyleSheet.create({
   searchIcon: { fontSize: 16, marginRight: 8 },
   input: { flex: 1, fontSize: 15, color: '#111827' },
   clearBtn: { fontSize: 14, color: '#9ca3af', paddingHorizontal: 4 },
+
+  filterRow: { paddingHorizontal: 16, paddingBottom: 10, gap: 8, alignItems: 'center' },
+  chip: {
+    paddingHorizontal: 14, paddingVertical: 8,
+    borderRadius: 20, borderWidth: 1.5, borderColor: '#e5e7eb',
+    backgroundColor: '#fff', alignSelf: 'flex-start',
+  },
+  chipActive: { backgroundColor: '#0f766e', borderColor: '#0f766e' },
+  chipText: { fontSize: 13, fontWeight: '600', color: '#374151' },
+  chipTextActive: { color: '#fff' },
 
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingBottom: 80 },
   emptyIcon: { fontSize: 48, marginBottom: 12 },

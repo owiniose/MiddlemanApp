@@ -1,51 +1,72 @@
-/**
- * Delivery fee zones for Uyo, Akwa Ibom.
- * Base city rate: ₦2,000
- * Outskirts rate: ₦2,500
- */
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
+export type DeliveryZone = {
+  name: string;
+  fee: number;
+  keywords: string[];
+};
+
+type ZonesConfig = {
+  zones: DeliveryZone[];
+  defaultFee: number;
+  defaultZoneName: string;
+};
+
+// Kept for backwards-compat with Checkout.tsx badge display
 export const CITY_FEE = 2000;
 export const OUTSKIRTS_FEE = 2500;
 
+const FALLBACK: ZonesConfig = {
+  zones: [
+    { name: 'Uyo City', fee: 2000, keywords: ['uyo'] },
+    {
+      name: 'Outskirts',
+      fee: 2500,
+      keywords: [
+        'ikot ekpene', 'eastern obolo', 'mkpat enin', 'oruk anam',
+        'nsit ubium', 'nsit atai', 'nsit ibom', 'ibiono ibom',
+        'ibesikpo', 'ukanafun', 'uruan', 'ibiono', 'etinan',
+        'ikono', 'abak', 'oron', 'eket', 'itu', 'ini',
+      ],
+    },
+  ],
+  defaultFee: 2000,
+  defaultZoneName: 'Uyo City',
+};
+
+let config: ZonesConfig = FALLBACK;
+
 /**
- * Towns/LGAs outside Uyo city centre that attract the outskirts rate.
- * Order matters: longer/more-specific phrases are checked first.
+ * Call once at app startup. Loads zones from Firestore and seeds the
+ * document with defaults if it doesn't exist yet.
  */
-const OUTSKIRT_AREAS = [
-  'ikot ekpene',   // must come before plain 'eket'
-  'eastern obolo',
-  'mkpat enin',
-  'oruk anam',
-  'nsit ubium',
-  'nsit atai',
-  'nsit ibom',
-  'ibiono ibom',
-  'ibesikpo',
-  'ukanafun',
-  'uruan',
-  'ibiono',
-  'etinan',
-  'ikono',
-  'abak',
-  'oron',
-  'eket',
-  'itu',
-  'ini',
-];
+export async function initDeliveryZones(): Promise<void> {
+  try {
+    const ref = doc(db, 'settings', 'deliveryZones');
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      config = snap.data() as ZonesConfig;
+    } else {
+      await setDoc(ref, FALLBACK);
+    }
+  } catch {
+    // Stay on fallback — app still works offline
+  }
+}
 
 export function getDeliveryFee(address: string): number {
   const text = address.toLowerCase();
-
-  // If the address explicitly mentions Uyo city, keep it at city rate
-  if (text.includes('uyo')) return CITY_FEE;
-
-  // Check for outskirt area names
-  if (OUTSKIRT_AREAS.some((area) => text.includes(area))) return OUTSKIRTS_FEE;
-
-  // Default — assume within Uyo
-  return CITY_FEE;
+  for (const zone of config.zones) {
+    if (zone.keywords.some((k) => text.includes(k))) return zone.fee;
+  }
+  return config.defaultFee;
 }
 
 export function getDeliveryZone(address: string): string {
-  return getDeliveryFee(address) === CITY_FEE ? 'Uyo city' : 'Outskirts';
+  const text = address.toLowerCase();
+  for (const zone of config.zones) {
+    if (zone.keywords.some((k) => text.includes(k))) return zone.name;
+  }
+  return config.defaultZoneName;
 }

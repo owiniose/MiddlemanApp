@@ -19,10 +19,15 @@ import VendorTabs from './navigation/VendorStack';
 import AdminTabs from './navigation/AdminStack';
 import AuthStack from './navigation/AuthStack';
 import { registerForPushNotificationsAsync, savePushToken } from './utils/notifications';
+import { initDeliveryZones } from './utils/deliveryFee';
 
 function AppNavigator() {
   const { user, profile, loading } = useAuth();
   const notificationListener = useRef<Notifications.EventSubscription | null>(null);
+
+  useEffect(() => {
+    initDeliveryZones();
+  }, []);
 
   // Register for push notifications whenever a user logs in
   useEffect(() => {

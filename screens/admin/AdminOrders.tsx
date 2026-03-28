@@ -86,6 +86,7 @@ export default function AdminOrders() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
+        style={{ height: 50 }}
         contentContainerStyle={styles.filterRow}
       >
         {(['All', ...ALL_STATUSES] as (OrderStatus | 'All')[]).map((s) => (
@@ -207,8 +208,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f9fafb' },
   header: { fontSize: 22, fontWeight: '700', color: '#111827', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 },
 
-  filterRow: { paddingHorizontal: 16, paddingBottom: 10, gap: 8 },
-  filterChip: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e7eb' },
+  filterRow: { paddingHorizontal: 16, paddingBottom: 10, gap: 8, alignItems: 'center', height: 50 },
+  filterChip: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e7eb', alignSelf: 'flex-start' },
   filterChipActive: { backgroundColor: '#0f766e', borderColor: '#0f766e' },
   filterChipText: { fontSize: 13, fontWeight: '600', color: '#6b7280' },
   filterChipTextActive: { color: '#fff' },

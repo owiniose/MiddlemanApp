@@ -5,6 +5,7 @@ import AdminDashboard from '../screens/admin/AdminDashboard';
 import AdminUsers from '../screens/admin/AdminUsers';
 import AdminVendors from '../screens/admin/AdminVendors';
 import AdminOrders from '../screens/admin/AdminOrders';
+import AdminDeliveryZones from '../screens/admin/AdminDeliveryZones';
 
 const Tab = createBottomTabNavigator();
 
@@ -15,6 +16,7 @@ const TAB_ICONS: Record<string, { active: IoniconName; inactive: IoniconName }> 
   Users:     { active: 'people',      inactive: 'people-outline' },
   Vendors:   { active: 'storefront',  inactive: 'storefront-outline' },
   Orders:    { active: 'receipt',     inactive: 'receipt-outline' },
+  Zones:     { active: 'map',         inactive: 'map-outline' },
 };
 
 export default function AdminTabs() {
@@ -36,6 +38,7 @@ export default function AdminTabs() {
       <Tab.Screen name="Users"     component={AdminUsers} />
       <Tab.Screen name="Vendors"   component={AdminVendors} />
       <Tab.Screen name="Orders"    component={AdminOrders} />
+      <Tab.Screen name="Zones"     component={AdminDeliveryZones} />
     </Tab.Navigator>
   );
 }

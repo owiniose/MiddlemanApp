@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   ScrollView, View, StyleSheet, TouchableOpacity,
   FlatList, Image, ImageBackground, ActivityIndicator,
 } from 'react-native';
 import Text from '../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { collection, getDocs } from 'firebase/firestore';
@@ -65,12 +66,16 @@ export default function Home() {
   const [vendorsByCategory, setVendorsByCategory] = useState<Record<string, Vendor[]>>({});
   const [featured, setFeatured] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openOnly, setOpenOnly] = useState(false);
+  const [topRated, setTopRated] = useState(false);
+  const [fastest, setFastest] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const firstName = profile?.name?.split(' ')[0] ?? '';
 
   useEffect(() => {
     getDocs(collection(db, 'vendors')).then((snap) => {
-      const all = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Vendor));
+      const all = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Vendor)).filter((v: any) => v.approved !== false);
       // Featured: open stores first, then sort by rating descending
       const sorted = [...all]
         .sort((a, b) => {
@@ -96,6 +101,18 @@ export default function Home() {
     });
 
   const hasAnyVendors = Object.values(vendorsByCategory).some((v) => v.length > 0);
+  const filtersActive = openOnly || topRated || fastest;
+
+  const filteredVendors = useMemo(() => {
+    let list = Object.values(vendorsByCategory).flat();
+    if (openOnly) list = list.filter((v) => v.open !== false);
+    if (topRated) list = [...list].sort((a, b) => parseFloat(b.rating ?? '0') - parseFloat(a.rating ?? '0'));
+    if (fastest) list = [...list].sort((a, b) => {
+      const parse = (t?: string) => parseInt(t?.match(/\d+/)?.[0] ?? '999');
+      return parse(a.deliveryTime) - parse(b.deliveryTime);
+    });
+    return list;
+  }, [vendorsByCategory, openOnly, topRated, fastest]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -103,11 +120,47 @@ export default function Home() {
 
         {/* Header */}
         <View style={styles.header}>
-          <View>
+          <View style={{ flex: 1 }}>
             <Text style={styles.greeting}>{timeGreeting()}{firstName ? `, ${firstName}` : ''} 👋</Text>
             <Text style={styles.locationSub}>What are you getting today? 🍽️</Text>
           </View>
+          <TouchableOpacity
+            style={[styles.filterBtn, filtersActive && styles.filterBtnActive]}
+            onPress={() => setFilterOpen((v) => !v)}
+            activeOpacity={0.75}
+          >
+            <Ionicons name="options-outline" size={18} color={filtersActive ? '#fff' : '#0f766e'} />
+            <Text style={[styles.filterBtnText, filtersActive && styles.filterBtnTextActive]}>Filter</Text>
+            {filtersActive && <View style={styles.filterDot} />}
+          </TouchableOpacity>
         </View>
+
+        {/* Collapsible filter panel */}
+        {filterOpen && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
+            <TouchableOpacity
+              style={[styles.chip, openOnly && styles.chipActive]}
+              onPress={() => setOpenOnly((v) => !v)}
+              activeOpacity={0.75}
+            >
+              <Text style={[styles.chipText, openOnly && styles.chipTextActive]}>Open now</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.chip, topRated && styles.chipActive]}
+              onPress={() => setTopRated((v) => !v)}
+              activeOpacity={0.75}
+            >
+              <Text style={[styles.chipText, topRated && styles.chipTextActive]}>Ratings {topRated ? '▲' : '▾'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.chip, fastest && styles.chipActive]}
+              onPress={() => setFastest((v) => !v)}
+              activeOpacity={0.75}
+            >
+              <Text style={[styles.chipText, fastest && styles.chipTextActive]}>Fastest {fastest ? '▲' : '▾'}</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        )}
 
         {/* Banner */}
         <ImageBackground source={{ uri: BANNER_URI }} style={styles.banner} imageStyle={styles.bannerImage}>
@@ -135,12 +188,14 @@ export default function Home() {
         </View>
 
         {/* Promo */}
-        <View style={styles.promoBox}>
-          <Text style={styles.promoText}>🎉 Free Delivery on your first 3 orders!</Text>
-        </View>
+        {!filtersActive && (
+          <View style={styles.promoBox}>
+            <Text style={styles.promoText}>🎉 Free Delivery on your first 3 orders!</Text>
+          </View>
+        )}
 
         {/* Featured */}
-        {!loading && featured.length > 0 && (
+        {!loading && featured.length > 0 && !filtersActive && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitleRow}>
@@ -161,7 +216,7 @@ export default function Home() {
           </View>
         )}
 
-        {/* Category sections */}
+        {/* Vendor list — filtered flat list or normal category sections */}
         {loading ? (
           <View style={styles.loader}>
             <ActivityIndicator size="large" color="#0f766e" />
@@ -172,6 +227,40 @@ export default function Home() {
             <Text style={styles.emptyTitle}>No vendors yet</Text>
             <Text style={styles.emptySubtitle}>Vendors will appear here once they sign up</Text>
           </View>
+        ) : filtersActive ? (
+          filteredVendors.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>😕</Text>
+              <Text style={styles.emptyTitle}>No matches</Text>
+              <Text style={styles.emptySubtitle}>Try removing a filter</Text>
+            </View>
+          ) : (
+            <View style={styles.flatList}>
+              {filteredVendors.map((item) => (
+                <TouchableOpacity key={item.id} style={styles.flatCard} onPress={() => goToVendor(item)} activeOpacity={0.85}>
+                  {item.image
+                    ? <Image source={{ uri: item.image }} style={styles.flatCardImage} />
+                    : <View style={[styles.flatCardImage, styles.cardImagePlaceholder]} />
+                  }
+                  {item.open === false && (
+                    <View style={styles.closedOverlay}><Text style={styles.closedOverlayText}>Closed</Text></View>
+                  )}
+                  <View style={styles.flatCardBody}>
+                    <View style={styles.flatCardTop}>
+                      <Text style={styles.cardTitle} numberOfLines={1}>{item.name}</Text>
+                      <Text style={styles.cardRating}>⭐ {item.rating ?? '—'}</Text>
+                    </View>
+                    <Text style={styles.cardArea}>📍 {item.area}</Text>
+                    <View style={styles.cardFooter}>
+                      {item.deliveryTime ? <Text style={styles.cardDelivery}>🕐 {item.deliveryTime}</Text> : null}
+                      {item.minOrder ? <Text style={styles.cardMinOrder}>· Min. {item.minOrder}</Text> : null}
+                      <Text style={styles.categoryChip}>{item.category}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )
         ) : (
           CATEGORIES.map((cat) => {
             const vendors = vendorsByCategory[cat.label];
@@ -187,7 +276,6 @@ export default function Home() {
                     <Text style={styles.sectionLink}>See all</Text>
                   </TouchableOpacity>
                 </View>
-
                 <FlatList
                   data={vendors}
                   horizontal
@@ -213,9 +301,18 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f9fafb' },
   scroll: { paddingBottom: 0 },
 
-  header: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 16 },
+  header: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 16, flexDirection: 'row', alignItems: 'center' },
   greeting: { fontSize: 20, fontWeight: '700', color: '#111827' },
   locationSub: { fontSize: 13, color: '#6b7280', marginTop: 2 },
+  filterBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20,
+    borderWidth: 1.5, borderColor: '#0f766e', backgroundColor: '#fff',
+  },
+  filterBtnActive: { backgroundColor: '#0f766e' },
+  filterBtnText: { fontSize: 13, fontWeight: '600', color: '#0f766e' },
+  filterBtnTextActive: { color: '#fff' },
+  filterDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#fff', marginLeft: 2 },
 
   banner: { height: 156, marginHorizontal: 16, borderRadius: 16, overflow: 'hidden', marginBottom: 20 },
   bannerImage: { borderRadius: 16 },
@@ -228,6 +325,19 @@ const styles = StyleSheet.create({
   categoryIcon: { width: 60, height: 60, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   categoryImage: { width: 38, height: 38 },
   categoryLabel: { fontSize: 11, fontWeight: '600', color: '#374151', textAlign: 'center' },
+
+  filterRow: { paddingHorizontal: 16, paddingBottom: 16, gap: 8, alignItems: 'center' },
+  chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1.5, borderColor: '#e5e7eb', backgroundColor: '#fff', alignSelf: 'flex-start' },
+  chipActive: { backgroundColor: '#0f766e', borderColor: '#0f766e' },
+  chipText: { fontSize: 13, fontWeight: '600', color: '#374151' },
+  chipTextActive: { color: '#fff' },
+
+  flatList: { paddingHorizontal: 16, gap: 12, marginBottom: 24 },
+  flatCard: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 14, elevation: 2, overflow: 'hidden' },
+  flatCardImage: { width: 100, height: 100, backgroundColor: '#f3f4f6' },
+  flatCardBody: { flex: 1, padding: 12, justifyContent: 'center', gap: 4 },
+  flatCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  categoryChip: { fontSize: 11, color: '#0f766e', fontWeight: '600', marginLeft: 'auto' },
 
   promoBox: { marginHorizontal: 16, backgroundColor: '#ecfdf5', borderWidth: 1, borderColor: '#a7f3d0', padding: 12, borderRadius: 12, marginBottom: 24 },
   promoText: { color: '#065f46', fontWeight: '600', fontSize: 13 },
