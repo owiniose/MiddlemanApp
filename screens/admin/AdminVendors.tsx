@@ -160,7 +160,7 @@ export default function AdminVendors() {
       </View>
 
       {loading ? (
-        <View style={styles.loader}><ActivityIndicator size="large" color="#0f766e" /></View>
+        <View style={styles.loader}><ActivityIndicator size="large" color="#1E22A3" /></View>
       ) : (
         <FlatList
           data={filtered}
@@ -194,7 +194,7 @@ export default function AdminVendors() {
                     value={item.open}
                     onValueChange={() => toggleOpen(item)}
                     disabled={toggling === item.id}
-                    trackColor={{ false: '#d1d5db', true: '#0f766e' }}
+                    trackColor={{ false: '#d1d5db', true: '#1E22A3' }}
                     thumbColor="#fff"
                   />
                 </View>
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
 
   tabs: { flexDirection: 'row', paddingHorizontal: 16, marginBottom: 8, gap: 8 },
   tab: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#e5e7eb', gap: 6 },
-  tabActive: { backgroundColor: '#0f766e', borderColor: '#0f766e' },
+  tabActive: { backgroundColor: '#1E22A3', borderColor: '#1E22A3' },
   tabText: { fontSize: 13, fontWeight: '600', color: '#6b7280' },
   tabTextActive: { color: '#fff' },
   badge: { backgroundColor: '#ef4444', borderRadius: 10, paddingHorizontal: 6, paddingVertical: 1 },
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   approvalRow: { flexDirection: 'row', gap: 8 },
   rejectBtn: { flex: 1, borderWidth: 1.5, borderColor: '#ef4444', borderRadius: 10, paddingVertical: 9, alignItems: 'center' },
   rejectBtnText: { color: '#ef4444', fontWeight: '700', fontSize: 13 },
-  approveBtn: { flex: 1, backgroundColor: '#0f766e', borderRadius: 10, paddingVertical: 9, alignItems: 'center' },
+  approveBtn: { flex: 1, backgroundColor: '#1E22A3', borderRadius: 10, paddingVertical: 9, alignItems: 'center' },
   approveBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
 
   modal: { flex: 1, backgroundColor: '#f9fafb' },
@@ -309,10 +309,10 @@ const styles = StyleSheet.create({
 
   catRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 6 },
   catChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1.5, borderColor: '#e5e7eb', backgroundColor: '#fff' },
-  catChipActive: { backgroundColor: '#0f766e', borderColor: '#0f766e' },
+  catChipActive: { backgroundColor: '#1E22A3', borderColor: '#1E22A3' },
   catChipText: { fontSize: 13, fontWeight: '600', color: '#6b7280' },
   catChipTextActive: { color: '#fff' },
 
-  saveBtn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 8 },
+  saveBtn: { backgroundColor: '#1E22A3', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 8 },
   saveBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });

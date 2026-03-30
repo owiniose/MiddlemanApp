@@ -12,8 +12,8 @@ export default function RootStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Main" component={TabNavigator} options={{ headerShown: false }} />
-      <Stack.Screen name="Cart" component={Cart} options={{ title: 'Your Cart', headerTintColor: '#0f766e' }} />
-      <Stack.Screen name="Checkout" component={Checkout} options={{ title: 'Checkout', headerTintColor: '#0f766e' }} />
+      <Stack.Screen name="Cart" component={Cart} options={{ title: 'Your Cart', headerTintColor: '#1E22A3' }} />
+      <Stack.Screen name="Checkout" component={Checkout} options={{ title: 'Checkout', headerTintColor: '#1E22A3' }} />
       <Stack.Screen name="OrderConfirmation" component={OrderConfirmation} options={{ headerShown: false }} />
     </Stack.Navigator>
   );

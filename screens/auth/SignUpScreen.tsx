@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import {
   View, TextInput, TouchableOpacity, StyleSheet,
-  KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
+  KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Image,
 } from 'react-native';
+
+const logo = require('../../assets/icon.png');
 import Text from '../../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth, UserRole, VendorStoreInfo } from '../../context/AuthContext';
@@ -58,7 +60,7 @@ export default function SignUpScreen({ onGoLogin }: Props) {
     <SafeAreaView style={styles.outer} edges={['top']}>
       {/* Teal header */}
       <View style={styles.header}>
-        <Text style={styles.logo}>🛵</Text>
+        <Image source={logo} style={styles.logoImg} resizeMode="contain" />
         <Text style={styles.appName}>Middleman</Text>
         <Text style={styles.tagline}>Join thousands of happy customers</Text>
       </View>
@@ -150,19 +152,19 @@ function friendlyError(code: string) {
 }
 
 const styles = StyleSheet.create({
-  outer: { flex: 1, backgroundColor: '#0f766e' },
+  outer: { flex: 1, backgroundColor: '#fff' },
 
-  header: { alignItems: 'center', paddingTop: 20, paddingBottom: 28 },
-  logo: { fontSize: 44 },
-  appName: { fontSize: 28, fontWeight: '800', color: '#fff', marginTop: 8, letterSpacing: -0.5 },
-  tagline: { fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 4 },
+  header: { alignItems: 'center', paddingTop: 20, paddingBottom: 28, backgroundColor: '#fff' },
+  logoImg: { width: 80, height: 80 },
+  appName: { fontSize: 28, fontWeight: '800', color: '#1E22A3', marginTop: 8, letterSpacing: -0.5 },
+  tagline: { fontSize: 13, color: '#6b7280', marginTop: 4 },
 
   cardWrap: { flex: 1 },
   card: {
     flexGrow: 1,
     backgroundColor: '#fff',
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
     padding: 28,
     paddingTop: 32,
   },
@@ -183,20 +185,20 @@ const styles = StyleSheet.create({
   },
   roleRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
   roleBtn: { flex: 1, borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 14, padding: 14, alignItems: 'center', gap: 6, backgroundColor: '#f9fafb' },
-  roleBtnActive: { borderColor: '#0f766e', backgroundColor: '#f0fdf4' },
+  roleBtnActive: { borderColor: '#1E22A3', backgroundColor: '#eef0ff' },
   roleEmoji: { fontSize: 26 },
   roleLabel: { fontSize: 14, fontWeight: '600', color: '#6b7280' },
-  roleLabelActive: { color: '#0f766e' },
+  roleLabelActive: { color: '#1E22A3' },
   divider: { height: 1, backgroundColor: '#f3f4f6', marginVertical: 20 },
   sectionTitle: { fontSize: 16, fontWeight: '700', color: '#111827', marginBottom: 16 },
   categoryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 14 },
   categoryBtn: { borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, backgroundColor: '#f9fafb' },
-  categoryBtnActive: { borderColor: '#0f766e', backgroundColor: '#f0fdf4' },
+  categoryBtnActive: { borderColor: '#1E22A3', backgroundColor: '#eef0ff' },
   categoryBtnText: { fontSize: 13, fontWeight: '600', color: '#6b7280' },
-  categoryBtnTextActive: { color: '#0f766e' },
-  btn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 8 },
+  categoryBtnTextActive: { color: '#1E22A3' },
+  btn: { backgroundColor: '#1E22A3', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 8 },
   btnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
   switchBtn: { alignItems: 'center', marginTop: 24 },
   switchText: { color: '#6b7280', fontSize: 14 },
-  switchLink: { color: '#0f766e', fontWeight: '700' },
+  switchLink: { color: '#1E22A3', fontWeight: '700' },
 });

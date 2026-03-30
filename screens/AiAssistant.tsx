@@ -204,7 +204,7 @@ export default function AiAssistant({ onClose }: { onClose?: () => void }) {
             ListFooterComponent={
               loading ? (
                 <View style={styles.typingIndicator}>
-                  <ActivityIndicator size="small" color="#0f766e" />
+                  <ActivityIndicator size="small" color="#1E22A3" />
                   <Text style={styles.typingText}>Mido is thinking...</Text>
                 </View>
               ) : null
@@ -247,8 +247,8 @@ const styles = StyleSheet.create({
   headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   avatar: {
     width: 40, height: 40, borderRadius: 20,
-    backgroundColor: '#f0fdf4', alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1.5, borderColor: '#bbf7d0',
+    backgroundColor: '#eef0ff', alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1.5, borderColor: '#c7caff',
   },
   avatarText: { fontSize: 20 },
   headerName: { fontSize: 16, fontWeight: '700', color: '#111827' },
@@ -260,14 +260,14 @@ const styles = StyleSheet.create({
   emptySub: { fontSize: 14, color: '#6b7280', textAlign: 'center', lineHeight: 20 },
   suggestionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginTop: 16 },
   suggestionChip: {
-    backgroundColor: '#f0fdf4', borderWidth: 1, borderColor: '#bbf7d0',
+    backgroundColor: '#eef0ff', borderWidth: 1, borderColor: '#c7caff',
     borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8,
   },
-  suggestionText: { fontSize: 13, color: '#065f46', fontWeight: '600' },
+  suggestionText: { fontSize: 13, color: '#0f1575', fontWeight: '600' },
 
   messageList: { padding: 16, gap: 10 },
   bubble: { maxWidth: '80%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10 },
-  bubbleUser: { backgroundColor: '#0f766e', alignSelf: 'flex-end', borderBottomRightRadius: 4 },
+  bubbleUser: { backgroundColor: '#1E22A3', alignSelf: 'flex-end', borderBottomRightRadius: 4 },
   bubbleAi: { backgroundColor: '#f3f4f6', alignSelf: 'flex-start', borderBottomLeftRadius: 4 },
   bubbleText: { fontSize: 14, lineHeight: 20 },
   bubbleTextUser: { color: '#fff' },
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
   },
   sendBtn: {
     width: 40, height: 40, borderRadius: 20,
-    backgroundColor: '#0f766e', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#1E22A3', alignItems: 'center', justifyContent: 'center',
   },
   sendBtnDisabled: { backgroundColor: '#d1d5db' },
   sendBtnText: { color: '#fff', fontSize: 20, fontWeight: '700' },

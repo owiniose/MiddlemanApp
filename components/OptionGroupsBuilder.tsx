@@ -74,7 +74,7 @@ export default function OptionGroupsBuilder({ groups, onChange }: Props) {
               <Switch
                 value={group.required}
                 onValueChange={(v) => updateGroup(gi, { required: v })}
-                trackColor={{ true: '#0f766e', false: '#d1d5db' }}
+                trackColor={{ true: '#1E22A3', false: '#d1d5db' }}
                 thumbColor="#fff"
               />
             </View>
@@ -83,7 +83,7 @@ export default function OptionGroupsBuilder({ groups, onChange }: Props) {
               <Switch
                 value={group.multiSelect}
                 onValueChange={(v) => updateGroup(gi, { multiSelect: v })}
-                trackColor={{ true: '#0f766e', false: '#d1d5db' }}
+                trackColor={{ true: '#1E22A3', false: '#d1d5db' }}
                 thumbColor="#fff"
               />
             </View>
@@ -159,8 +159,8 @@ const styles = StyleSheet.create({
   removeChoiceText: { color: '#ef4444', fontSize: 12, fontWeight: '700' },
 
   addChoiceBtn: { alignSelf: 'flex-start', marginTop: 2 },
-  addChoiceBtnText: { color: '#0f766e', fontSize: 13, fontWeight: '600' },
+  addChoiceBtnText: { color: '#1E22A3', fontSize: 13, fontWeight: '600' },
 
-  addGroupBtn: { borderWidth: 1.5, borderColor: '#0f766e', borderStyle: 'dashed', borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
-  addGroupBtnText: { color: '#0f766e', fontWeight: '700', fontSize: 14 },
+  addGroupBtn: { borderWidth: 1.5, borderColor: '#1E22A3', borderStyle: 'dashed', borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
+  addGroupBtnText: { color: '#1E22A3', fontWeight: '700', fontSize: 14 },
 });

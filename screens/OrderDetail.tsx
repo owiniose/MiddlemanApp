@@ -141,10 +141,10 @@ export default function OrderDetail({ route, navigation }: Props) {
         {/* Order info */}
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Order Info</Text>
-          <Row label="Order ID" value={order.id} />
+          <Row label="Order ID" value={`#${order.orderNumber ?? order.id}`} />
           <Row label="Vendor" value={order.vendorName} />
           <Row label="Date" value={`${date} · ${time}`} />
-          <Row label="Payment" value="Cash on Delivery" />
+          <Row label="Payment" value={(order as any).paymentMethod ?? 'Cash on Delivery'} />
         </View>
 
         {/* Delivery info */}
@@ -218,11 +218,11 @@ const styles = StyleSheet.create({
   tracker: { flexDirection: 'row', alignItems: 'center' },
   trackerStep: { alignItems: 'center', gap: 6 },
   trackerDot: { width: 14, height: 14, borderRadius: 7, backgroundColor: '#e5e7eb', borderWidth: 2, borderColor: '#e5e7eb' },
-  trackerDotActive: { backgroundColor: '#0f766e', borderColor: '#0f766e' },
+  trackerDotActive: { backgroundColor: '#1E22A3', borderColor: '#1E22A3' },
   trackerLine: { flex: 1, height: 2, backgroundColor: '#e5e7eb', marginBottom: 18 },
-  trackerLineActive: { backgroundColor: '#0f766e' },
+  trackerLineActive: { backgroundColor: '#1E22A3' },
   trackerLabel: { fontSize: 11, color: '#9ca3af' },
-  trackerLabelActive: { color: '#0f766e', fontWeight: '700' },
+  trackerLabelActive: { color: '#1E22A3', fontWeight: '700' },
 
   reviewCard: { backgroundColor: '#fff', borderRadius: 14, padding: 16, alignItems: 'center', gap: 10 },
   reviewPrompt: { fontSize: 15, fontWeight: '600', color: '#111827' },
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   divider: { height: 1, backgroundColor: '#f3f4f6' },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 4 },
   totalLabel: { fontWeight: '700', fontSize: 15 },
-  totalValue: { fontWeight: '700', fontSize: 15, color: '#0f766e' },
+  totalValue: { fontWeight: '700', fontSize: 15, color: '#1E22A3' },
 
   footer: { paddingHorizontal: 16, paddingBottom: 12, backgroundColor: '#fff', borderTopWidth: 1, borderColor: '#f3f4f6' },
   cancelBtn: { marginTop: 12, borderWidth: 1.5, borderColor: '#ef4444', borderRadius: 14, paddingVertical: 14, alignItems: 'center' },

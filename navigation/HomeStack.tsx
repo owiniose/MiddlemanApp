@@ -14,7 +14,7 @@ export default function HomeStack() {
       <Stack.Screen
         name="CategoryList"
         component={CategoryList}
-        options={({ route }) => ({ title: route.params.category, headerTintColor: '#0f766e' })}
+        options={({ route }) => ({ title: route.params.category, headerTintColor: '#1E22A3' })}
       />
       <Stack.Screen
         name="VendorDetail"

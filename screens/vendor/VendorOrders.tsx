@@ -12,6 +12,7 @@ type OrderStatus = 'Pending' | 'Preparing' | 'On the way' | 'Delivered' | 'Cance
 
 type Order = {
   id: string;
+  orderNumber?: string;
   customerId: string;
   customerName: string;
   items: { name: string; qty: number; price: number }[];
@@ -122,7 +123,7 @@ export default function VendorOrders() {
     notifyCustomer(order.customerId, 'Cancelled', profile?.name ?? 'Your vendor');
   };
 
-  if (loading) return <View style={styles.center}><ActivityIndicator size="large" color="#0f766e" /></View>;
+  if (loading) return <View style={styles.center}><ActivityIndicator size="large" color="#1E22A3" /></View>;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -147,7 +148,7 @@ export default function VendorOrders() {
               <View style={styles.card}>
                 <View style={styles.cardTop}>
                   <View>
-                    <Text style={styles.orderId}>{item.id}</Text>
+                    <Text style={styles.orderId}>#{item.orderNumber ?? item.id}</Text>
                     <Text style={styles.customerName}>{item.customerName}</Text>
                   </View>
                   <View style={{ alignItems: 'flex-end', gap: 4 }}>
@@ -216,9 +217,9 @@ const styles = StyleSheet.create({
   itemText: { fontSize: 13, color: '#374151' },
   cardMeta: { gap: 4 },
   metaText: { fontSize: 12, color: '#6b7280' },
-  total: { fontSize: 15, fontWeight: '700', color: '#0f766e', marginTop: 4 },
+  total: { fontSize: 15, fontWeight: '700', color: '#1E22A3', marginTop: 4 },
   actionRow: { flexDirection: 'row', gap: 8 },
-  actionBtn: { backgroundColor: '#0f766e', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 16, alignItems: 'center' },
+  actionBtn: { backgroundColor: '#1E22A3', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 16, alignItems: 'center' },
   actionBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
   cancelBtn: { borderWidth: 1.5, borderColor: '#ef4444', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 16, alignItems: 'center' },
   cancelBtnText: { color: '#ef4444', fontWeight: '700', fontSize: 13 },

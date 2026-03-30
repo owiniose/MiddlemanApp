@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import {
   View, TextInput, TouchableOpacity, StyleSheet,
-  KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
+  KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Image,
 } from 'react-native';
+
+const logo = require('../../assets/icon.png');
 import Text from '../../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
@@ -33,7 +35,7 @@ export default function LoginScreen({ onGoSignUp }: Props) {
     <SafeAreaView style={styles.outer} edges={['top']}>
       {/* Teal header */}
       <View style={styles.header}>
-        <Text style={styles.logo}>🛵</Text>
+        <Image source={logo} style={styles.logoImg} resizeMode="contain" />
         <Text style={styles.appName}>Middleman</Text>
         <Text style={styles.tagline}>Delivery at your doorstep</Text>
       </View>
@@ -92,18 +94,18 @@ function friendlyError(code: string) {
 }
 
 const styles = StyleSheet.create({
-  outer: { flex: 1, backgroundColor: '#0f766e' },
+  outer: { flex: 1, backgroundColor: '#fff' },
 
-  header: { alignItems: 'center', paddingTop: 28, paddingBottom: 36 },
-  logo: { fontSize: 52 },
-  appName: { fontSize: 30, fontWeight: '800', color: '#fff', marginTop: 10, letterSpacing: -0.5 },
-  tagline: { fontSize: 14, color: 'rgba(255,255,255,0.75)', marginTop: 4 },
+  header: { alignItems: 'center', paddingTop: 28, paddingBottom: 36, backgroundColor: '#fff' },
+  logoImg: { width: 80, height: 80 },
+  appName: { fontSize: 30, fontWeight: '800', color: '#1E22A3', marginTop: 10, letterSpacing: -0.5 },
+  tagline: { fontSize: 14, color: '#6b7280', marginTop: 4 },
 
   cardWrap: { flex: 1 },
   card: {
     flexGrow: 1,
     backgroundColor: '#fff',
-    borderTopLeftRadius: 28,
+    borderTopLeftRadius: 0,
     borderTopRightRadius: 28,
     padding: 28,
     paddingTop: 32,
@@ -123,9 +125,9 @@ const styles = StyleSheet.create({
     color: '#111827',
     marginBottom: 16,
   },
-  btn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 4 },
+  btn: { backgroundColor: '#1E22A3', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 4 },
   btnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
   switchBtn: { alignItems: 'center', marginTop: 24 },
   switchText: { color: '#6b7280', fontSize: 14 },
-  switchLink: { color: '#0f766e', fontWeight: '700' },
+  switchLink: { color: '#1E22A3', fontWeight: '700' },
 });

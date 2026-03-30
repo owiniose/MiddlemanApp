@@ -7,6 +7,7 @@ export type OrderStatus = 'Pending' | 'Preparing' | 'On the way' | 'Delivered' |
 
 export type Order = {
   id: string;
+  orderNumber?: string;
   vendorId: string;
   vendorName: string;
   items: CartItem[];
@@ -21,7 +22,7 @@ export type Order = {
 
 type OrdersContextType = {
   orders: Order[];
-  addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'status'>, customerId: string, customerName: string, extras?: { paymentMethod?: string; paymentReference?: string }) => Promise<string>;
+  addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'status'>, customerId: string, customerName: string, extras?: { paymentMethod?: string; paymentReference?: string }) => Promise<{ id: string; orderNumber: string }>;
   cancelOrder: (orderId: string) => void;
   listenToOrders: (customerId: string) => () => void;
 };
@@ -32,15 +33,18 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
   const [orders, setOrders] = useState<Order[]>([]);
 
   const addOrder = async (order: Omit<Order, 'id' | 'createdAt' | 'status'>, customerId: string, customerName: string, extras?: { paymentMethod?: string; paymentReference?: string }) => {
+    const orderNumber = String(Math.floor(Math.random() * 9_000_000_000) + 1_000_000_000);
     const docRef = await addDoc(collection(db, 'orders'), {
       ...order,
       customerId,
       customerName,
+      orderNumber,
       status: 'Pending',
       createdAt: serverTimestamp(),
-      ...extras,
+      ...(extras?.paymentMethod ? { paymentMethod: extras.paymentMethod } : {}),
+      ...(extras?.paymentReference ? { paymentReference: extras.paymentReference } : {}),
     });
-    return docRef.id;
+    return { id: docRef.id, orderNumber };
   };
 
   const cancelOrder = async (orderId: string) => {

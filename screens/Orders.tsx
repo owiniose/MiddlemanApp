@@ -30,7 +30,7 @@ function OrderCard({ order }: { order: Order }) {
       <View style={styles.cardTop}>
         <View style={{ flex: 1 }}>
           <Text style={styles.vendorName}>{order.vendorName}</Text>
-          <Text style={styles.orderId}>{order.id}</Text>
+          <Text style={styles.orderId}>#{order.orderNumber ?? order.id}</Text>
         </View>
         <View style={[styles.statusBadge, { backgroundColor: status.bg }]}>
           <Text style={[styles.statusText, { color: status.color }]}>{status.label}</Text>
@@ -95,6 +95,6 @@ const styles = StyleSheet.create({
   statusText: { fontSize: 12, fontWeight: '600' },
   itemsSummary: { fontSize: 13, color: '#6b7280', lineHeight: 18 },
   cardBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 },
-  total: { fontWeight: '700', fontSize: 15, color: '#0f766e' },
+  total: { fontWeight: '700', fontSize: 15, color: '#1E22A3' },
   time: { fontSize: 12, color: '#9ca3af' },
 });

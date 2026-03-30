@@ -306,7 +306,7 @@ export default function VendorDetail({ route }: Props) {
 
         {loading ? (
           <View style={styles.menuLoader}>
-            <ActivityIndicator size="small" color="#0f766e" />
+            <ActivityIndicator size="small" color="#1E22A3" />
           </View>
         ) : menuSections.length === 0 ? (
           <View style={styles.emptyMenu}>
@@ -365,7 +365,7 @@ export default function VendorDetail({ route }: Props) {
         <View style={styles.reviewsSection}>
           <Text style={styles.reviewsTitle}>Reviews</Text>
           {reviewsLoading ? (
-            <ActivityIndicator size="small" color="#0f766e" style={{ marginTop: 12 }} />
+            <ActivityIndicator size="small" color="#1E22A3" style={{ marginTop: 12 }} />
           ) : reviews.length === 0 ? (
             <Text style={styles.noReviews}>No reviews yet — be the first!</Text>
           ) : (
@@ -447,15 +447,15 @@ const styles = StyleSheet.create({
   menuName: { fontWeight: '600', fontSize: 14, marginBottom: 2 },
   menuDesc: { color: '#6b7280', fontSize: 12, marginBottom: 4 },
   menuPriceRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
-  menuPrice: { fontWeight: '700', color: '#0f766e' },
-  customizableBadge: { backgroundColor: '#f0fdf4', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
-  customizableBadgeText: { fontSize: 10, color: '#0f766e', fontWeight: '600' },
+  menuPrice: { fontWeight: '700', color: '#1E22A3' },
+  customizableBadge: { backgroundColor: '#eef0ff', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
+  customizableBadgeText: { fontSize: 10, color: '#1E22A3', fontWeight: '600' },
 
   qtyControl: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  qtyBtn: { width: 28, height: 28, borderRadius: 14, borderWidth: 1.5, borderColor: '#0f766e', alignItems: 'center', justifyContent: 'center' },
-  qtyBtnText: { color: '#0f766e', fontSize: 16, lineHeight: 20 },
+  qtyBtn: { width: 28, height: 28, borderRadius: 14, borderWidth: 1.5, borderColor: '#1E22A3', alignItems: 'center', justifyContent: 'center' },
+  qtyBtnText: { color: '#1E22A3', fontSize: 16, lineHeight: 20 },
   qtyCount: { fontSize: 14, fontWeight: '600', minWidth: 16, textAlign: 'center' },
-  addBtn: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#0f766e', alignItems: 'center', justifyContent: 'center' },
+  addBtn: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#1E22A3', alignItems: 'center', justifyContent: 'center' },
   addBtnDisabled: { backgroundColor: '#d1d5db' },
   addBtnText: { color: '#fff', fontSize: 18, lineHeight: 22 },
   closedBanner: { backgroundColor: '#fef2f2', borderRadius: 10, marginHorizontal: 16, marginTop: 12, padding: 12 },
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
   noReviews: { color: '#9ca3af', fontSize: 14, textAlign: 'center', paddingVertical: 16 },
   reviewCard: { backgroundColor: '#f9fafb', borderRadius: 12, padding: 12, marginBottom: 10, gap: 6 },
   reviewTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  reviewAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#0f766e', alignItems: 'center', justifyContent: 'center' },
+  reviewAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#1E22A3', alignItems: 'center', justifyContent: 'center' },
   reviewAvatarText: { color: '#fff', fontWeight: '700', fontSize: 14 },
   reviewName: { fontSize: 13, fontWeight: '700', color: '#111827' },
   reviewStars: { flexDirection: 'row', gap: 2, marginTop: 2 },
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
   reviewComment: { fontSize: 13, color: '#374151', lineHeight: 18, paddingLeft: 46 },
 
   cartBarWrap: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 16, paddingBottom: 12 },
-  cartBar: { backgroundColor: '#0f766e', borderRadius: 14, flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 16 },
+  cartBar: { backgroundColor: '#1E22A3', borderRadius: 14, flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 16 },
   cartCountBadge: { backgroundColor: '#0d9488', width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
   cartCountText: { color: '#fff', fontSize: 12, fontWeight: '700' },
   cartBarLabel: { flex: 1, color: '#fff', fontWeight: '700', fontSize: 15 },
@@ -509,20 +509,20 @@ const mStyles = StyleSheet.create({
   badgeMultiText: { fontSize: 11, fontWeight: '600', color: '#1d4ed8' },
 
   choiceRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10, marginBottom: 6, backgroundColor: '#f9fafb', borderWidth: 1.5, borderColor: 'transparent' },
-  choiceRowSelected: { backgroundColor: '#f0fdf4', borderColor: '#0f766e' },
+  choiceRowSelected: { backgroundColor: '#eef0ff', borderColor: '#1E22A3' },
   selector: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: '#d1d5db', alignItems: 'center', justifyContent: 'center' },
-  selectorSelected: { borderColor: '#0f766e' },
-  selectorDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#0f766e' },
+  selectorSelected: { borderColor: '#1E22A3' },
+  selectorDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#1E22A3' },
   choiceName: { flex: 1, fontSize: 14, color: '#374151' },
   choiceNameSelected: { color: '#111827', fontWeight: '600' },
   choicePrice: { fontSize: 13, color: '#9ca3af' },
-  choicePriceSelected: { color: '#0f766e', fontWeight: '600' },
+  choicePriceSelected: { color: '#1E22A3', fontWeight: '600' },
 
   footer: { paddingHorizontal: 20, paddingBottom: 24, paddingTop: 12, borderTopWidth: 1, borderColor: '#f3f4f6' },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
   totalLabel: { fontSize: 15, fontWeight: '700', color: '#111827' },
-  totalValue: { fontSize: 18, fontWeight: '700', color: '#0f766e' },
-  addBtn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
+  totalValue: { fontSize: 18, fontWeight: '700', color: '#1E22A3' },
+  addBtn: { backgroundColor: '#1E22A3', borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
   addBtnDisabled: { backgroundColor: '#d1d5db' },
   addBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });

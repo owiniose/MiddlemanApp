@@ -227,7 +227,7 @@ export default function Search() {
 
       {loading ? (
         <View style={styles.emptyState}>
-          <ActivityIndicator size="large" color="#0f766e" />
+          <ActivityIndicator size="large" color="#1E22A3" />
         </View>
       ) : !query.trim() && !hasFilter ? (
         <View style={styles.emptyState}>
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     borderRadius: 20, borderWidth: 1.5, borderColor: '#e5e7eb',
     backgroundColor: '#fff', alignSelf: 'flex-start',
   },
-  chipActive: { backgroundColor: '#0f766e', borderColor: '#0f766e' },
+  chipActive: { backgroundColor: '#1E22A3', borderColor: '#1E22A3' },
   chipText: { fontSize: 13, fontWeight: '600', color: '#374151' },
   chipTextActive: { color: '#fff' },
 
@@ -299,10 +299,10 @@ const styles = StyleSheet.create({
   cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 },
   cardTitle: { fontSize: 14, fontWeight: '700', flex: 1, marginRight: 8 },
   cardRating: { fontSize: 12, color: '#374151' },
-  menuPrice: { fontSize: 13, fontWeight: '700', color: '#0f766e' },
+  menuPrice: { fontSize: 13, fontWeight: '700', color: '#1E22A3' },
   cardSubtitle: { fontSize: 12, color: '#6b7280', marginBottom: 5 },
   cardMeta: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   metaText: { fontSize: 11, color: '#6b7280' },
   metaDot: { color: '#d1d5db', fontSize: 11 },
-  categoryTag: { fontSize: 11, color: '#0f766e', fontWeight: '600' },
+  categoryTag: { fontSize: 11, color: '#1E22A3', fontWeight: '600' },
 });

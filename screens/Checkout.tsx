@@ -32,6 +32,7 @@ export default function Checkout({ navigation }: Props) {
   const [errors, setErrors] = useState<{ address?: string; phone?: string }>({});
   const [addressModal, setAddressModal] = useState(false);
   const [paymentError, setPaymentError] = useState('');
+  const [placing, setPlacing] = useState(false);
 
   const deliveryFee = getDeliveryFee(address);
   const deliveryZone = address.trim() ? getDeliveryZone(address) : null;
@@ -40,30 +41,37 @@ export default function Checkout({ navigation }: Props) {
     const e: typeof errors = {};
     if (!address.trim()) e.address = 'Delivery address is required';
     if (!phone.trim()) e.phone = 'Phone number is required';
-    else if (!/^\+?[\d\s-]{7,15}$/.test(phone.trim())) e.phone = 'Enter a valid phone number';
+    else if (phone.trim().replace(/[\s\-+]/g, '').length < 7) e.phone = 'Enter a valid phone number';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
   const placeOrder = async (paymentReference?: string) => {
     if (!validate()) return;
-    const orderId = await addOrder(
-      {
-        vendorId: vendorId!,
-        vendorName: vendorName!,
-        items,
-        subtotal: total,
-        deliveryFee: deliveryFee,
-        total: total + deliveryFee,
-        address: address.trim(),
-        phone: phone.trim(),
-      },
-      user?.uid ?? '',
-      profile?.name ?? 'Customer',
-      { paymentMethod: payment, paymentReference },
-    );
-    clearCart();
-    navigation.replace('OrderConfirmation', { orderId, vendorName: vendorName!, total: total + deliveryFee });
+    setPlacing(true);
+    try {
+      const { id: orderId, orderNumber } = await addOrder(
+        {
+          vendorId: vendorId!,
+          vendorName: vendorName!,
+          items,
+          subtotal: total,
+          deliveryFee: deliveryFee,
+          total: total + deliveryFee,
+          address: address.trim(),
+          phone: phone.trim(),
+        },
+        user?.uid ?? '',
+        profile?.name ?? 'Customer',
+        { paymentMethod: payment, paymentReference },
+      );
+      clearCart();
+      navigation.replace('OrderConfirmation', { orderId, orderNumber, vendorName: vendorName!, total: total + deliveryFee });
+    } catch (e: any) {
+      setPaymentError(e?.message ?? 'Failed to place order. Please try again.');
+    } finally {
+      setPlacing(false);
+    }
   };
 
   const handleFlutterwaveRedirect = ({ status, transaction_id }: { status: string; transaction_id: string }) => {
@@ -177,8 +185,8 @@ export default function Checkout({ navigation }: Props) {
       <SafeAreaView edges={['bottom']} style={styles.footer}>
         {paymentError ? <Text style={styles.paymentErrorText}>{paymentError}</Text> : null}
         {payment === 'Cash on Delivery' ? (
-          <TouchableOpacity style={styles.placeOrderBtn} onPress={() => placeOrder()}>
-            <Text style={styles.placeOrderText}>Place Order · ₦{(total + deliveryFee).toLocaleString()}</Text>
+          <TouchableOpacity style={[styles.placeOrderBtn, placing && styles.placeOrderBtnLoading]} onPress={() => placeOrder()} disabled={placing}>
+            {placing ? <ActivityIndicator color="#fff" /> : <Text style={styles.placeOrderText}>Place Order · ₦{(total + deliveryFee).toLocaleString()}</Text>}
           </TouchableOpacity>
         ) : (
           <PayWithFlutterwave
@@ -229,7 +237,7 @@ export default function Checkout({ navigation }: Props) {
                   style={styles.addressOption}
                   onPress={() => { setAddress(item.address); setErrors((e) => ({ ...e, address: undefined })); setAddressModal(false); }}
                 >
-                  <Ionicons name="location-outline" size={18} color="#0f766e" style={{ marginRight: 10 }} />
+                  <Ionicons name="location-outline" size={18} color="#1E22A3" style={{ marginRight: 10 }} />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.addressLabel}>{item.label}</Text>
                     <Text style={styles.addressText}>{item.address}</Text>
@@ -255,23 +263,23 @@ const styles = StyleSheet.create({
   field: { marginBottom: 16 },
   labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
   label: { fontSize: 13, fontWeight: '600', color: '#374151' },
-  savedLink: { fontSize: 13, color: '#0f766e', fontWeight: '600' },
+  savedLink: { fontSize: 13, color: '#1E22A3', fontWeight: '600' },
   input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, padding: 12, fontSize: 14, color: '#111827' },
   inputError: { borderColor: '#ef4444' },
   errorText: { color: '#ef4444', fontSize: 12, marginTop: 4 },
 
-  zoneBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f0fdf4', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, marginTop: 6 },
+  zoneBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#eef0ff', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, marginTop: 6 },
   zoneBadgeOutskirts: { backgroundColor: '#fffbeb' },
-  zoneText: { fontSize: 12, fontWeight: '600', color: '#065f46' },
+  zoneText: { fontSize: 12, fontWeight: '600', color: '#0f1575' },
   zoneTextOutskirts: { color: '#92400e' },
 
   paymentOption: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 10, padding: 14, marginBottom: 8, gap: 12 },
   radio: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: '#d1d5db' },
-  radioSelected: { borderColor: '#0f766e', backgroundColor: '#0f766e' },
+  radioSelected: { borderColor: '#1E22A3', backgroundColor: '#1E22A3' },
   paymentLabel: { fontSize: 14, color: '#111827' },
 
   summaryCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, gap: 8 },
-  vendorName: { fontWeight: '700', fontSize: 14, marginBottom: 4, color: '#0f766e' },
+  vendorName: { fontWeight: '700', fontSize: 14, marginBottom: 4, color: '#1E22A3' },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   summaryItemBlock: { gap: 2 },
   summaryItem: { fontSize: 13, color: '#374151', flex: 1 },
@@ -282,10 +290,10 @@ const styles = StyleSheet.create({
   divider: { height: 1, backgroundColor: '#f3f4f6', marginVertical: 4 },
   totalRow: { borderTopWidth: 1, borderColor: '#f3f4f6', paddingTop: 8 },
   totalLabel: { fontWeight: '700', fontSize: 15 },
-  totalValue: { fontWeight: '700', fontSize: 15, color: '#0f766e' },
+  totalValue: { fontWeight: '700', fontSize: 15, color: '#1E22A3' },
 
   footer: { paddingHorizontal: 16, paddingBottom: 12, backgroundColor: '#fff', borderTopWidth: 1, borderColor: '#f3f4f6' },
-  placeOrderBtn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 12 },
+  placeOrderBtn: { backgroundColor: '#1E22A3', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 12 },
   placeOrderBtnLoading: { opacity: 0.7 },
   placeOrderText: { color: '#fff', fontWeight: '700', fontSize: 15 },
   paymentErrorText: { color: '#ef4444', fontSize: 13, textAlign: 'center', marginTop: 8 },

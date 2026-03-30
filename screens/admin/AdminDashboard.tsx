@@ -83,13 +83,13 @@ export default function AdminDashboard() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {loading ? (
           <View style={styles.loader}>
-            <ActivityIndicator size="large" color="#0f766e" />
+            <ActivityIndicator size="large" color="#1E22A3" />
           </View>
         ) : (
           <>
             <View style={styles.statsGrid}>
               <StatCard label="Customers" value={stats!.customers} icon="👤" color="#e0f2fe" />
-              <StatCard label="Vendors" value={stats!.vendors} icon="🏪" color="#f0fdf4" />
+              <StatCard label="Vendors" value={stats!.vendors} icon="🏪" color="#eef0ff" />
               <StatCard label="Orders" value={stats!.orders} icon="📦" color="#fef3c7" />
               <StatCard label="Revenue" value={`₦${stats!.revenue.toLocaleString()}`} icon="💰" color="#fce7f3" />
             </View>
@@ -172,6 +172,6 @@ const styles = StyleSheet.create({
   statusDot: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   statusText: { fontSize: 12, fontWeight: '600' },
   orderBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  orderTotal: { fontWeight: '700', fontSize: 14, color: '#0f766e' },
+  orderTotal: { fontWeight: '700', fontSize: 14, color: '#1E22A3' },
   orderTime: { fontSize: 12, color: '#9ca3af' },
 });

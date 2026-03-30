@@ -21,7 +21,7 @@ const ROLES = ['customer', 'vendor', 'admin'] as const;
 
 const ROLE_STYLE: Record<string, { bg: string; color: string }> = {
   customer: { bg: '#e0f2fe', color: '#0369a1' },
-  vendor:   { bg: '#f0fdf4', color: '#15803d' },
+  vendor:   { bg: '#eef0ff', color: '#15803d' },
   admin:    { bg: '#fef3c7', color: '#b45309' },
 };
 
@@ -105,7 +105,7 @@ export default function AdminUsers() {
       </View>
 
       {loading ? (
-        <View style={styles.loader}><ActivityIndicator size="large" color="#0f766e" /></View>
+        <View style={styles.loader}><ActivityIndicator size="large" color="#1E22A3" /></View>
       ) : (
         <FlatList
           data={filtered}
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   empty: { textAlign: 'center', color: '#9ca3af', paddingVertical: 32, fontSize: 14 },
 
   card: { backgroundColor: '#fff', borderRadius: 12, padding: 14, flexDirection: 'row', alignItems: 'center', elevation: 1, gap: 10 },
-  avatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: '#0f766e', alignItems: 'center', justifyContent: 'center' },
+  avatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: '#1E22A3', alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: '#fff', fontWeight: '700', fontSize: 16 },
   info: { flex: 1 },
   name: { fontSize: 14, fontWeight: '700', color: '#111827' },
@@ -224,10 +224,10 @@ const styles = StyleSheet.create({
 
   roleRow: { flexDirection: 'row', gap: 8, marginTop: 6 },
   roleChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1.5, borderColor: '#e5e7eb', backgroundColor: '#fff' },
-  roleChipActive: { backgroundColor: '#0f766e', borderColor: '#0f766e' },
+  roleChipActive: { backgroundColor: '#1E22A3', borderColor: '#1E22A3' },
   roleChipText: { fontSize: 13, fontWeight: '600', color: '#6b7280', textTransform: 'capitalize' },
   roleChipTextActive: { color: '#fff' },
 
-  saveBtn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 8 },
+  saveBtn: { backgroundColor: '#1E22A3', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 8 },
   saveBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });

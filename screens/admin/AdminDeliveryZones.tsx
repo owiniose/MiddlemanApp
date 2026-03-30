@@ -89,7 +89,7 @@ export default function AdminDeliveryZones() {
     ]);
   };
 
-  if (loading) return <View style={styles.center}><ActivityIndicator size="large" color="#0f766e" /></View>;
+  if (loading) return <View style={styles.center}><ActivityIndicator size="large" color="#1E22A3" /></View>;
   if (!config) return <View style={styles.center}><Text>Failed to load config.</Text></View>;
 
   return (
@@ -167,7 +167,7 @@ export default function AdminDeliveryZones() {
         </View>
 
         <TouchableOpacity style={styles.addBtn} onPress={addZone}>
-          <Ionicons name="add-circle-outline" size={18} color="#0f766e" />
+          <Ionicons name="add-circle-outline" size={18} color="#1E22A3" />
           <Text style={styles.addBtnText}>Add Zone</Text>
         </TouchableOpacity>
 
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff', borderBottomWidth: 1, borderColor: '#f3f4f6',
   },
   header: { fontSize: 20, fontWeight: '700', color: '#111827' },
-  saveBtn: { backgroundColor: '#0f766e', paddingHorizontal: 18, paddingVertical: 8, borderRadius: 20 },
+  saveBtn: { backgroundColor: '#1E22A3', paddingHorizontal: 18, paddingVertical: 8, borderRadius: 20 },
   saveBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
 
   scroll: { padding: 16, gap: 12 },
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
 
   card: { backgroundColor: '#fff', borderRadius: 14, padding: 14, gap: 6, elevation: 1 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  zoneNumber: { fontSize: 13, fontWeight: '700', color: '#0f766e', textTransform: 'uppercase', letterSpacing: 0.5 },
+  zoneNumber: { fontSize: 13, fontWeight: '700', color: '#1E22A3', textTransform: 'uppercase', letterSpacing: 0.5 },
   cardHeader2: { fontSize: 13, fontWeight: '700', color: '#6b7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 },
 
   label: { fontSize: 12, fontWeight: '600', color: '#374151', marginTop: 4 },
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   addBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: 8, padding: 14, borderRadius: 14, borderWidth: 1.5,
-    borderColor: '#0f766e', borderStyle: 'dashed',
+    borderColor: '#1E22A3', borderStyle: 'dashed',
   },
-  addBtnText: { color: '#0f766e', fontWeight: '700', fontSize: 14 },
+  addBtnText: { color: '#1E22A3', fontWeight: '700', fontSize: 14 },
 });

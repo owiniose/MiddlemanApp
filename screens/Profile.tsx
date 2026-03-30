@@ -47,7 +47,7 @@ export default function Profile({ navigation }: Props) {
             {email ? <Text style={styles.avatarSub}>{email}</Text> : null}
           </View>
           <TouchableOpacity style={styles.editBtn} onPress={() => navigation.navigate('EditProfile')}>
-            <Ionicons name="pencil" size={16} color="#0f766e" />
+            <Ionicons name="pencil" size={16} color="#1E22A3" />
           </TouchableOpacity>
         </View>
 
@@ -74,7 +74,7 @@ export default function Profile({ navigation }: Props) {
             <Switch
               value={notifications}
               onValueChange={setNotifications}
-              trackColor={{ true: '#0f766e', false: '#e5e7eb' }}
+              trackColor={{ true: '#1E22A3', false: '#e5e7eb' }}
               thumbColor="#fff"
             />
           </View>
@@ -138,12 +138,12 @@ const styles = StyleSheet.create({
   header: { fontSize: 22, fontWeight: '700', color: '#111827', marginBottom: 16 },
 
   avatarCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 14, padding: 16, marginBottom: 20, elevation: 1 },
-  avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#0f766e', alignItems: 'center', justifyContent: 'center', marginRight: 14 },
+  avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#1E22A3', alignItems: 'center', justifyContent: 'center', marginRight: 14 },
   avatarText: { color: '#fff', fontSize: 20, fontWeight: '700' },
   avatarInfo: { flex: 1 },
   avatarName: { fontSize: 16, fontWeight: '700', color: '#111827' },
   avatarSub: { fontSize: 13, color: '#6b7280', marginTop: 2 },
-  editBtn: { padding: 8, backgroundColor: '#f0fdf4', borderRadius: 20 },
+  editBtn: { padding: 8, backgroundColor: '#eef0ff', borderRadius: 20 },
 
   sectionLabel: { fontSize: 12, fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8, marginLeft: 4 },
   menuCard: { backgroundColor: '#fff', borderRadius: 14, marginBottom: 20, elevation: 1 },

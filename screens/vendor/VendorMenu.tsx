@@ -46,7 +46,7 @@ export default function VendorMenu({ navigation }: Props) {
     ]);
   };
 
-  if (loading) return <View style={styles.center}><ActivityIndicator size="large" color="#0f766e" /></View>;
+  if (loading) return <View style={styles.center}><ActivityIndicator size="large" color="#1E22A3" /></View>;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -96,7 +96,7 @@ export default function VendorMenu({ navigation }: Props) {
                   })}
                   style={styles.actionBtn}
                 >
-                  <Ionicons name="pencil-outline" size={18} color="#0f766e" />
+                  <Ionicons name="pencil-outline" size={18} color="#1E22A3" />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleDelete(item)} style={styles.actionBtn}>
                   <Ionicons name="trash-outline" size={18} color="#ef4444" />
@@ -115,12 +115,12 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, paddingBottom: 8 },
   header: { fontSize: 22, fontWeight: '700' },
-  addBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0f766e', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, gap: 4 },
+  addBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1E22A3', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, gap: 4 },
   addBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 },
   emptyIcon: { fontSize: 48 },
   emptyTitle: { fontSize: 16, fontWeight: '700', color: '#374151' },
-  emptyAddBtn: { backgroundColor: '#0f766e', borderRadius: 12, paddingHorizontal: 20, paddingVertical: 10 },
+  emptyAddBtn: { backgroundColor: '#1E22A3', borderRadius: 12, paddingHorizontal: 20, paddingVertical: 10 },
   emptyAddBtnText: { color: '#fff', fontWeight: '700' },
   list: { padding: 16, gap: 10 },
   card: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 12, padding: 10, elevation: 1 },
@@ -128,9 +128,9 @@ const styles = StyleSheet.create({
   cardImagePlaceholder: { backgroundColor: '#f3f4f6' },
   cardInfo: { flex: 1 },
   itemName: { fontWeight: '700', fontSize: 14, color: '#111827' },
-  itemSection: { fontSize: 11, color: '#0f766e', fontWeight: '600', marginTop: 1 },
+  itemSection: { fontSize: 11, color: '#1E22A3', fontWeight: '600', marginTop: 1 },
   itemDesc: { fontSize: 12, color: '#6b7280', marginTop: 2 },
-  itemPrice: { fontSize: 14, fontWeight: '700', color: '#0f766e', marginTop: 4 },
+  itemPrice: { fontSize: 14, fontWeight: '700', color: '#1E22A3', marginTop: 4 },
   actions: { flexDirection: 'column', gap: 8, paddingLeft: 4 },
   actionBtn: { padding: 6 },
 });

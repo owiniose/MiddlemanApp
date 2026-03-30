@@ -42,7 +42,7 @@ export default function TabNavigator() {
             const name = focused ? icons.active : icons.inactive;
             return <Ionicons name={name} size={size} color={color} />;
           },
-          tabBarActiveTintColor: '#0f766e',
+          tabBarActiveTintColor: '#1E22A3',
           tabBarInactiveTintColor: '#9ca3af',
           tabBarStyle: {
             height: 70,
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#0f766e',
+    backgroundColor: '#1E22A3',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 6,

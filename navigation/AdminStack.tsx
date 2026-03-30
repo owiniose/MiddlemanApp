@@ -24,7 +24,7 @@ export default function AdminTabs() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: '#0f766e',
+        tabBarActiveTintColor: '#1E22A3',
         tabBarInactiveTintColor: '#9ca3af',
         tabBarStyle: { height: 70, paddingBottom: 14, paddingTop: 8, marginBottom: 8 },
         tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },

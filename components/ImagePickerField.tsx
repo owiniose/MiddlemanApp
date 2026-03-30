@@ -94,7 +94,7 @@ export default function ImagePickerField({
         activeOpacity={0.8}
       >
         {uploading ? (
-          <ActivityIndicator color="#0f766e" />
+          <ActivityIndicator color="#1E22A3" />
         ) : value ? (
           <Image source={{ uri: value }} style={[styles.image, { borderRadius }]} />
         ) : (
@@ -134,11 +134,11 @@ const styles = StyleSheet.create({
   changeBtn: {
     paddingHorizontal: 12,
     paddingVertical: 4,
-    backgroundColor: '#f0fdf4',
+    backgroundColor: '#eef0ff',
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#bbf7d0',
+    borderColor: '#c7caff',
   },
-  changeBtnText: { fontSize: 12, color: '#0f766e', fontWeight: '600' },
+  changeBtnText: { fontSize: 12, color: '#1E22A3', fontWeight: '600' },
   errorText: { fontSize: 12, color: '#ef4444', textAlign: 'center' },
 });

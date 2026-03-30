@@ -75,12 +75,12 @@ export default function Support() {
           {/* Contact cards */}
           <View style={styles.contactRow}>
             <View style={styles.contactCard}>
-              <Ionicons name="call-outline" size={22} color="#0f766e" />
+              <Ionicons name="call-outline" size={22} color="#1E22A3" />
               <Text style={styles.contactLabel}>Call Us</Text>
               <Text style={styles.contactValue}>0800-MIDDLEMAN</Text>
             </View>
             <View style={styles.contactCard}>
-              <Ionicons name="mail-outline" size={22} color="#0f766e" />
+              <Ionicons name="mail-outline" size={22} color="#1E22A3" />
               <Text style={styles.contactLabel}>Email Us</Text>
               <Text style={styles.contactValue}>help@middleman.ng</Text>
             </View>
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   fieldLabel: { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 6 },
   input: { backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, padding: 12, fontSize: 14, color: '#111827' },
   inputMulti: { minHeight: 100, textAlignVertical: 'top', marginBottom: 4 },
-  sendBtn: { backgroundColor: '#0f766e', borderRadius: 12, paddingVertical: 13, alignItems: 'center', marginTop: 12 },
+  sendBtn: { backgroundColor: '#1E22A3', borderRadius: 12, paddingVertical: 13, alignItems: 'center', marginTop: 12 },
   sendBtnDisabled: { opacity: 0.6 },
   sendBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });

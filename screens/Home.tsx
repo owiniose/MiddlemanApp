@@ -129,7 +129,7 @@ export default function Home() {
             onPress={() => setFilterOpen((v) => !v)}
             activeOpacity={0.75}
           >
-            <Ionicons name="options-outline" size={18} color={filtersActive ? '#fff' : '#0f766e'} />
+            <Ionicons name="options-outline" size={18} color={filtersActive ? '#fff' : '#1E22A3'} />
             <Text style={[styles.filterBtnText, filtersActive && styles.filterBtnTextActive]}>Filter</Text>
             {filtersActive && <View style={styles.filterDot} />}
           </TouchableOpacity>
@@ -219,7 +219,7 @@ export default function Home() {
         {/* Vendor list — filtered flat list or normal category sections */}
         {loading ? (
           <View style={styles.loader}>
-            <ActivityIndicator size="large" color="#0f766e" />
+            <ActivityIndicator size="large" color="#1E22A3" />
           </View>
         ) : !hasAnyVendors ? (
           <View style={styles.emptyState}>
@@ -307,10 +307,10 @@ const styles = StyleSheet.create({
   filterBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
     paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20,
-    borderWidth: 1.5, borderColor: '#0f766e', backgroundColor: '#fff',
+    borderWidth: 1.5, borderColor: '#1E22A3', backgroundColor: '#fff',
   },
-  filterBtnActive: { backgroundColor: '#0f766e' },
-  filterBtnText: { fontSize: 13, fontWeight: '600', color: '#0f766e' },
+  filterBtnActive: { backgroundColor: '#1E22A3' },
+  filterBtnText: { fontSize: 13, fontWeight: '600', color: '#1E22A3' },
   filterBtnTextActive: { color: '#fff' },
   filterDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#fff', marginLeft: 2 },
 
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
 
   filterRow: { paddingHorizontal: 16, paddingBottom: 16, gap: 8, alignItems: 'center' },
   chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1.5, borderColor: '#e5e7eb', backgroundColor: '#fff', alignSelf: 'flex-start' },
-  chipActive: { backgroundColor: '#0f766e', borderColor: '#0f766e' },
+  chipActive: { backgroundColor: '#1E22A3', borderColor: '#1E22A3' },
   chipText: { fontSize: 13, fontWeight: '600', color: '#374151' },
   chipTextActive: { color: '#fff' },
 
@@ -337,10 +337,10 @@ const styles = StyleSheet.create({
   flatCardImage: { width: 100, height: 100, backgroundColor: '#f3f4f6' },
   flatCardBody: { flex: 1, padding: 12, justifyContent: 'center', gap: 4 },
   flatCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  categoryChip: { fontSize: 11, color: '#0f766e', fontWeight: '600', marginLeft: 'auto' },
+  categoryChip: { fontSize: 11, color: '#1E22A3', fontWeight: '600', marginLeft: 'auto' },
 
-  promoBox: { marginHorizontal: 16, backgroundColor: '#ecfdf5', borderWidth: 1, borderColor: '#a7f3d0', padding: 12, borderRadius: 12, marginBottom: 24 },
-  promoText: { color: '#065f46', fontWeight: '600', fontSize: 13 },
+  promoBox: { marginHorizontal: 16, backgroundColor: '#eef0ff', borderWidth: 1, borderColor: '#c7caff', padding: 12, borderRadius: 12, marginBottom: 24 },
+  promoText: { color: '#0f1575', fontWeight: '600', fontSize: 13 },
 
   loader: { paddingVertical: 60, alignItems: 'center' },
   emptyState: { paddingVertical: 48, alignItems: 'center', gap: 8 },
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
   sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   sectionEmoji: { fontSize: 18 },
   sectionTitle: { fontSize: 17, fontWeight: '700', color: '#111827' },
-  sectionLink: { fontSize: 13, color: '#0f766e', fontWeight: '600' },
+  sectionLink: { fontSize: 13, color: '#1E22A3', fontWeight: '600' },
   sectionList: { paddingLeft: 16, paddingRight: 8 },
 
   card: { width: 200, marginRight: 12, borderRadius: 14, backgroundColor: '#fff', elevation: 2, overflow: 'hidden' },

@@ -8,7 +8,7 @@ import { RootStackParamList } from '../types/navigation';
 type Props = NativeStackScreenProps<RootStackParamList, 'OrderConfirmation'>;
 
 export default function OrderConfirmation({ route, navigation }: Props) {
-  const { orderId, vendorName, total } = route.params;
+  const { orderId, orderNumber, vendorName, total } = route.params;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -20,7 +20,7 @@ export default function OrderConfirmation({ route, navigation }: Props) {
         <View style={styles.infoCard}>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Order ID</Text>
-            <Text style={styles.infoValue}>{orderId}</Text>
+            <Text style={styles.infoValue}>#{orderNumber}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Total Paid</Text>
@@ -73,8 +73,8 @@ const styles = StyleSheet.create({
   statusText: { color: '#d97706', fontWeight: '600', fontSize: 13 },
 
   footer: { padding: 16, gap: 10 },
-  trackBtn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
+  trackBtn: { backgroundColor: '#1E22A3', borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
   trackBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
   homeBtn: { borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
-  homeBtnText: { color: '#0f766e', fontWeight: '600', fontSize: 15 },
+  homeBtnText: { color: '#1E22A3', fontWeight: '600', fontSize: 15 },
 });

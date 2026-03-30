@@ -67,7 +67,7 @@ export default function VendorStoreSettings() {
   };
 
   if (loading) {
-    return <View style={styles.center}><ActivityIndicator size="large" color="#0f766e" /></View>;
+    return <View style={styles.center}><ActivityIndicator size="large" color="#1E22A3" /></View>;
   }
 
   if (!store) {
@@ -144,7 +144,7 @@ export default function VendorStoreSettings() {
             <Switch
               value={store.open}
               onValueChange={(v) => set('open')(v)}
-              trackColor={{ true: '#0f766e', false: '#e5e7eb' }}
+              trackColor={{ true: '#1E22A3', false: '#e5e7eb' }}
               thumbColor="#fff"
             />
           </View>
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
   header: { fontSize: 22, fontWeight: '700', color: '#111827', marginBottom: 16 },
 
   accountCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 14, padding: 16, marginBottom: 20, elevation: 1, gap: 14 },
-  avatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#0f766e', alignItems: 'center', justifyContent: 'center' },
+  avatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#1E22A3', alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: '#fff', fontSize: 18, fontWeight: '700' },
   accountName: { fontSize: 15, fontWeight: '700', color: '#111827' },
   accountEmail: { fontSize: 13, color: '#6b7280', marginTop: 2 },
@@ -204,15 +204,15 @@ const styles = StyleSheet.create({
 
   categoryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 },
   categoryBtn: { borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, backgroundColor: '#fff' },
-  categoryBtnActive: { borderColor: '#0f766e', backgroundColor: '#f0fdf4' },
+  categoryBtnActive: { borderColor: '#1E22A3', backgroundColor: '#eef0ff' },
   categoryBtnText: { fontSize: 13, fontWeight: '600', color: '#6b7280' },
-  categoryBtnTextActive: { color: '#0f766e' },
+  categoryBtnTextActive: { color: '#1E22A3' },
 
   toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   toggleLabel: { fontSize: 15, fontWeight: '600', color: '#111827' },
   toggleSub: { fontSize: 12, color: '#9ca3af', marginTop: 2 },
 
-  saveBtn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginBottom: 12 },
+  saveBtn: { backgroundColor: '#1E22A3', borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginBottom: 12 },
   saveBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
   signOutBtn: { backgroundColor: '#fff', borderRadius: 14, paddingVertical: 14, alignItems: 'center', elevation: 1 },
   signOutText: { color: '#ef4444', fontWeight: '700', fontSize: 15 },

@@ -16,8 +16,8 @@ function MenuStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="VendorMenu" component={VendorMenu} options={{ headerShown: false }} />
-      <Stack.Screen name="VendorAddItem" component={VendorAddItem} options={{ title: 'Add Menu Item', headerTintColor: '#0f766e' }} />
-      <Stack.Screen name="VendorEditItem" component={VendorEditItem} options={{ title: 'Edit Menu Item', headerTintColor: '#0f766e' }} />
+      <Stack.Screen name="VendorAddItem" component={VendorAddItem} options={{ title: 'Add Menu Item', headerTintColor: '#1E22A3' }} />
+      <Stack.Screen name="VendorEditItem" component={VendorEditItem} options={{ title: 'Edit Menu Item', headerTintColor: '#1E22A3' }} />
       <Stack.Screen name="VendorOrders" component={VendorOrders} options={{ headerShown: false }} />
       <Stack.Screen name="VendorStoreSettings" component={VendorStoreSettings} options={{ headerShown: false }} />
     </Stack.Navigator>
@@ -29,7 +29,7 @@ export default function VendorTabs() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: '#0f766e',
+        tabBarActiveTintColor: '#1E22A3',
         tabBarInactiveTintColor: '#9ca3af',
         tabBarStyle: { height: 70, paddingBottom: 14, paddingTop: 8, marginBottom: 8 },
         tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },

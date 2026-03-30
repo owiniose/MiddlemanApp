@@ -11,8 +11,8 @@ export default function ProfileStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="ProfileMain" component={Profile} options={{ headerShown: false }} />
-      <Stack.Screen name="EditProfile" component={EditProfile} options={{ title: 'Edit Profile', headerTintColor: '#0f766e' }} />
-      <Stack.Screen name="ManageAddresses" component={ManageAddresses} options={{ title: 'Saved Addresses', headerTintColor: '#0f766e' }} />
+      <Stack.Screen name="EditProfile" component={EditProfile} options={{ title: 'Edit Profile', headerTintColor: '#1E22A3' }} />
+      <Stack.Screen name="ManageAddresses" component={ManageAddresses} options={{ title: 'Saved Addresses', headerTintColor: '#1E22A3' }} />
     </Stack.Navigator>
   );
 }

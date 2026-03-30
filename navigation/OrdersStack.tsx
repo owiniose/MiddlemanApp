@@ -10,7 +10,7 @@ export default function OrdersStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="OrdersList" component={Orders} options={{ headerShown: false }} />
-      <Stack.Screen name="OrderDetail" component={OrderDetail} options={{ title: 'Order Details', headerTintColor: '#0f766e' }} />
+      <Stack.Screen name="OrderDetail" component={OrderDetail} options={{ title: 'Order Details', headerTintColor: '#1E22A3' }} />
     </Stack.Navigator>
   );
 }

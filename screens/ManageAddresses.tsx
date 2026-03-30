@@ -55,7 +55,7 @@ export default function ManageAddresses() {
         renderItem={({ item }) => (
           <View style={styles.addressCard}>
             <View style={styles.addressIcon}>
-              <Ionicons name={item.label.toLowerCase() === 'home' ? 'home' : item.label.toLowerCase() === 'work' ? 'briefcase' : 'location'} size={20} color="#0f766e" />
+              <Ionicons name={item.label.toLowerCase() === 'home' ? 'home' : item.label.toLowerCase() === 'work' ? 'briefcase' : 'location'} size={20} color="#1E22A3" />
             </View>
             <View style={styles.addressInfo}>
               <Text style={styles.addressLabel}>{item.label}</Text>
@@ -126,14 +126,14 @@ const styles = StyleSheet.create({
   emptySubtitle: { fontSize: 13, color: '#9ca3af', textAlign: 'center' },
 
   addressCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 12, padding: 14, elevation: 1 },
-  addressIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#f0fdf4', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
+  addressIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#eef0ff', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
   addressInfo: { flex: 1 },
   addressLabel: { fontWeight: '700', fontSize: 14, color: '#111827' },
   addressText: { fontSize: 13, color: '#6b7280', marginTop: 2 },
   deleteBtn: { padding: 8 },
 
   footer: { padding: 16, paddingBottom: 12 },
-  addBtn: { backgroundColor: '#0f766e', borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14 },
+  addBtn: { backgroundColor: '#1E22A3', borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14 },
   addBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 
   modalOverlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' },
@@ -145,6 +145,6 @@ const styles = StyleSheet.create({
   inputMulti: { minHeight: 80, textAlignVertical: 'top' },
   inputError: { borderColor: '#ef4444' },
   errorText: { color: '#ef4444', fontSize: 12, marginTop: 4 },
-  saveBtn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginTop: 20 },
+  saveBtn: { backgroundColor: '#1E22A3', borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginTop: 20 },
   saveBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });

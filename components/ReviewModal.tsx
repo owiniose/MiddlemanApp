@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
   errorText: { color: '#ef4444', fontSize: 13, textAlign: 'center' },
 
-  submitBtn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 15, alignItems: 'center' },
+  submitBtn: { backgroundColor: '#1E22A3', borderRadius: 14, paddingVertical: 15, alignItems: 'center' },
   submitBtnDisabled: { backgroundColor: '#d1d5db' },
   submitText: { color: '#fff', fontWeight: '700', fontSize: 16 },
   skipBtn: { alignItems: 'center', paddingBottom: 4 },

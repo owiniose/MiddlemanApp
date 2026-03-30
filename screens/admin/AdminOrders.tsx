@@ -11,6 +11,7 @@ import { OrderStatus } from '../../context/OrdersContext';
 
 type AdminOrder = {
   id: string;
+  orderNumber?: string;
   vendorName: string;
   customerName: string;
   customerPhone: string;
@@ -46,6 +47,7 @@ export default function AdminOrders() {
         const data = d.data();
         return {
           id: d.id,
+          orderNumber: data.orderNumber,
           vendorName: data.vendorName ?? '—',
           customerName: data.customerName ?? '—',
           customerPhone: data.phone ?? '—',
@@ -101,7 +103,7 @@ export default function AdminOrders() {
       </ScrollView>
 
       {loading ? (
-        <View style={styles.loader}><ActivityIndicator size="large" color="#0f766e" /></View>
+        <View style={styles.loader}><ActivityIndicator size="large" color="#1E22A3" /></View>
       ) : (
         <FlatList
           data={filtered}
@@ -116,6 +118,7 @@ export default function AdminOrders() {
                   <View style={{ flex: 1 }}>
                     <Text style={styles.vendorName}>{item.vendorName}</Text>
                     <Text style={styles.customerName}>👤 {item.customerName}</Text>
+                    {item.orderNumber && <Text style={styles.orderNumber}>#{item.orderNumber}</Text>}
                   </View>
                   <View style={[styles.statusBadge, { backgroundColor: sc.bg }]}>
                     <Text style={[styles.statusText, { color: sc.color }]}>{item.status}</Text>
@@ -148,8 +151,9 @@ export default function AdminOrders() {
             </View>
             <ScrollView contentContainerStyle={styles.modalScroll}>
               <View style={styles.modalSection}>
-                <Text style={styles.modalLabel}>Vendor</Text>
-                <Text style={styles.modalValue}>{selected.vendorName}</Text>
+                <Text style={styles.modalLabel}>Order</Text>
+                <Text style={styles.modalValue}>#{selected.orderNumber ?? selected.id}</Text>
+                <Text style={styles.modalSub}>{selected.vendorName}</Text>
               </View>
               <View style={styles.modalSection}>
                 <Text style={styles.modalLabel}>Customer</Text>
@@ -172,7 +176,7 @@ export default function AdminOrders() {
                 </View>
                 <View style={styles.itemRow}>
                   <Text style={[styles.itemName, { fontWeight: '700' }]}>Total</Text>
-                  <Text style={[styles.itemPrice, { color: '#0f766e' }]}>₦{selected.total.toLocaleString()}</Text>
+                  <Text style={[styles.itemPrice, { color: '#1E22A3' }]}>₦{selected.total.toLocaleString()}</Text>
                 </View>
               </View>
 
@@ -194,7 +198,7 @@ export default function AdminOrders() {
                     );
                   })}
                 </View>
-                {updating && <ActivityIndicator size="small" color="#0f766e" style={{ marginTop: 12 }} />}
+                {updating && <ActivityIndicator size="small" color="#1E22A3" style={{ marginTop: 12 }} />}
               </View>
             </ScrollView>
           </SafeAreaView>
@@ -210,7 +214,7 @@ const styles = StyleSheet.create({
 
   filterRow: { paddingHorizontal: 16, paddingBottom: 10, gap: 8, alignItems: 'center', height: 50 },
   filterChip: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e7eb', alignSelf: 'flex-start' },
-  filterChipActive: { backgroundColor: '#0f766e', borderColor: '#0f766e' },
+  filterChipActive: { backgroundColor: '#1E22A3', borderColor: '#1E22A3' },
   filterChipText: { fontSize: 13, fontWeight: '600', color: '#6b7280' },
   filterChipTextActive: { color: '#fff' },
 
@@ -222,11 +226,12 @@ const styles = StyleSheet.create({
   cardTop: { flexDirection: 'row', alignItems: 'flex-start' },
   vendorName: { fontSize: 14, fontWeight: '700', color: '#111827' },
   customerName: { fontSize: 12, color: '#6b7280', marginTop: 1 },
+  orderNumber: { fontSize: 11, color: '#9ca3af', marginTop: 1 },
   statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, marginLeft: 8 },
   statusText: { fontSize: 12, fontWeight: '600' },
   itemsSummary: { fontSize: 13, color: '#9ca3af' },
   cardBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  total: { fontWeight: '700', fontSize: 14, color: '#0f766e' },
+  total: { fontWeight: '700', fontSize: 14, color: '#1E22A3' },
   time: { fontSize: 12, color: '#9ca3af' },
 
   modal: { flex: 1, backgroundColor: '#f9fafb' },

@@ -2,7 +2,7 @@ export type RootStackParamList = {
   Main: undefined;
   Cart: undefined;
   Checkout: undefined;
-  OrderConfirmation: { orderId: string; vendorName: string; total: number };
+  OrderConfirmation: { orderId: string; orderNumber: string; vendorName: string; total: number };
 };
 
 export type HomeStackParamList = {

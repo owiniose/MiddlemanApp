@@ -33,7 +33,7 @@ export default function CategoryList({ route, navigation }: Props) {
   }, [category]);
 
   if (loading) {
-    return <View style={styles.center}><ActivityIndicator size="large" color="#0f766e" /></View>;
+    return <View style={styles.center}><ActivityIndicator size="large" color="#1E22A3" /></View>;
   }
 
   return (

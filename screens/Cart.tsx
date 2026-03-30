@@ -125,8 +125,8 @@ const styles = StyleSheet.create({
   emptySubtitle: { fontSize: 14, color: '#6b7280' },
 
   list: { padding: 16, gap: 12 },
-  vendorRow: { backgroundColor: '#f0fdf4', borderRadius: 10, padding: 10, marginBottom: 4 },
-  vendorLabel: { fontSize: 13, fontWeight: '700', color: '#065f46' },
+  vendorRow: { backgroundColor: '#eef0ff', borderRadius: 10, padding: 10, marginBottom: 4 },
+  vendorLabel: { fontSize: 13, fontWeight: '700', color: '#0f1575' },
 
   card: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 14, padding: 12, elevation: 1, gap: 12 },
   cardImage: { width: 64, height: 64, borderRadius: 10, backgroundColor: '#f3f4f6' },
@@ -136,11 +136,11 @@ const styles = StyleSheet.create({
   tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginBottom: 4 },
   tag: { backgroundColor: '#f3f4f6', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 },
   tagText: { fontSize: 11, color: '#374151' },
-  itemPrice: { fontWeight: '700', color: '#0f766e', fontSize: 14 },
+  itemPrice: { fontWeight: '700', color: '#1E22A3', fontSize: 14 },
 
   qtyControl: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   qtyBtn: { width: 30, height: 30, borderRadius: 15, borderWidth: 1.5, borderColor: '#d1d5db', alignItems: 'center', justifyContent: 'center' },
-  qtyBtnAdd: { backgroundColor: '#0f766e', borderColor: '#0f766e' },
+  qtyBtnAdd: { backgroundColor: '#1E22A3', borderColor: '#1E22A3' },
   qtyBtnText: { color: '#374151', fontSize: 16, lineHeight: 20 },
   qtyBtnAddText: { color: '#fff' },
   qtyCount: { fontSize: 15, fontWeight: '700', minWidth: 18, textAlign: 'center', color: '#111827' },
@@ -153,10 +153,10 @@ const styles = StyleSheet.create({
   feeNoteText: { fontSize: 11, color: '#9ca3af', textAlign: 'center' },
   totalRow: { borderTopWidth: 1, borderColor: '#f3f4f6', paddingTop: 10, marginTop: 2 },
   totalLabel: { fontWeight: '700', fontSize: 16, color: '#111827' },
-  totalValue: { fontWeight: '700', fontSize: 16, color: '#0f766e' },
+  totalValue: { fontWeight: '700', fontSize: 16, color: '#1E22A3' },
 
   footer: { paddingHorizontal: 16, paddingBottom: 12, backgroundColor: '#fff', borderTopWidth: 1, borderColor: '#f3f4f6' },
-  checkoutBtn: { backgroundColor: '#0f766e', borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 15, paddingHorizontal: 20, marginTop: 12 },
+  checkoutBtn: { backgroundColor: '#1E22A3', borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 15, paddingHorizontal: 20, marginTop: 12 },
   checkoutText: { color: '#fff', fontWeight: '700', fontSize: 15 },
   checkoutTotal: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "MiddlemanApp",
+    "name": "Middleman",
     "slug": "MiddlemanApp",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -20,6 +20,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "package": "com.middlemanapp",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
@@ -27,7 +28,26 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
-    ]
+      "expo-font",
+      "expo-av",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "MiddlemanApp needs access to your photos to upload images."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#0f766e"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "23ae083d-66b1-4aa9-8b45-fbce620a9dfa"
+      }
+    }
   }
 }

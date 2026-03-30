@@ -120,6 +120,6 @@ const styles = StyleSheet.create({
   fieldError: { color: '#ef4444', fontSize: 12, marginTop: 4 },
   divider: { height: 1, backgroundColor: '#e5e7eb', marginVertical: 20 },
   footer: { paddingHorizontal: 16, paddingBottom: 12, backgroundColor: '#fff', borderTopWidth: 1, borderColor: '#f3f4f6' },
-  saveBtn: { backgroundColor: '#0f766e', borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginTop: 12 },
+  saveBtn: { backgroundColor: '#1E22A3', borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginTop: 12 },
   saveBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });
